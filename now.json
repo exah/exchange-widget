@@ -1,0 +1,5 @@
+{
+  "alias": "exchange-widget",
+  "type": "docker",
+  "public": true
+}
