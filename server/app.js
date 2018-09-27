@@ -4,8 +4,8 @@ const compression = require('compression')
 const bodyParser = require('body-parser')
 const webpackUniversalAndHot = require('@exah/webpack-universal-hot-middleware')
 const webpackConfig = require(config.paths.root + '/webpack.config.js')
-
-const app = express()
+const sample = require('../data/latest.json')
+const app = require('./create-app')
 
 app.use(bodyParser.json())
 app.use(compression({ threshold: 0 }))
@@ -23,5 +23,12 @@ app.use(webpackUniversalAndHot({
   clientStatsFileName: 'clientStats.json',
   serverStatsFileName: 'serverStats.json'
 }))
+
+app.io.on('connection', (socket) => {
+  socket.on('exchange-currency', (currency) => {
+    console.log('exchange-currency', currency)
+    socket.emit('exchange-rates', sample)
+  })
+})
 
 module.exports = app

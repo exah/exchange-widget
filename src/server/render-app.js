@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet'
 import { extractCritical } from 'emotion-server'
 import { renderToString } from 'react-dom/server'
 import { getInitialData } from 'react-universal-data'
+import { Provider as ReduxProvider } from 'react-redux'
+import createStore from '../store'
 import App from '../app'
 import template from './template'
 
@@ -19,13 +21,19 @@ const renderApp = (tree) => {
   }
 }
 
-const renderAppMiddleware = (files) => (req, res, next) => {
+export default (files) => function renderAppMiddleware (req, res, next) {
+  const store = createStore()
+
   const context = {
     status: 200,
     statusText: 'OK'
   }
 
-  const appElement = (<App />)
+  const appElement = (
+    <ReduxProvider store={store}>
+      <App />
+    </ReduxProvider>
+  )
 
   return getInitialData(appElement)
     .catch((error) => {
@@ -52,12 +60,17 @@ const renderAppMiddleware = (files) => (req, res, next) => {
         return
       }
 
+      if (context.status >= 400) {
+        return Promise.reject(new Error(context.statusText))
+      }
+
       const app = renderApp(appElement)
 
       const ssrData = {
         config: config.public,
         cssIds: app.cssIds,
-        initialData
+        initialData,
+        intialState: store.getState()
       }
 
       res.send(template({
@@ -70,5 +83,3 @@ const renderAppMiddleware = (files) => (req, res, next) => {
       next(error)
     })
 }
-
-export default renderAppMiddleware

@@ -21,7 +21,7 @@ if (isProd && scale && cluster.isMaster) {
 } else {
   const app = require('./app')
 
-  const server = app.listen(port, () =>
+  const server = app.server.listen(port, () =>
     console.log(`> Server started at ${siteUrl}`)
   )
 

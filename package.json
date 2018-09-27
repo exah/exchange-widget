@@ -11,7 +11,7 @@
     "start": "cross-env NODE_ENV=production node server",
     "build": "cross-env NODE_ENV=production webpack-cli",
     "dev": "nodemon -w server server",
-    "test": "eslint .",
+    "test": "eslint . && ava",
     "prebuild": "rimraf dist",
     "precommit": "lint-staged"
   },
@@ -29,6 +29,12 @@
       "react/prop-types": 0
     }
   },
+  "ava": {
+    "verbose": true,
+    "require": [
+      "@babel/register"
+    ]
+  },
   "browserslist": "> 1%",
   "devDependencies": {
     "@babel/cli": "^7.1.0",
@@ -38,6 +44,8 @@
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "ava": "^1.0.0-beta.8",
     "babel-eslint": "10.0.0",
     "babel-loader": "^8.0.2",
     "babel-plugin-dynamic-import-node": "^2.1.0",
@@ -82,8 +90,15 @@
     "react-dom": "^16.5.2",
     "react-emotion": "^9.2.10",
     "react-helmet": "^5.2.0",
+    "react-redux": "^5.0.7",
     "react-universal-data": "^2.2.2",
     "recompose": "^0.30.0",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.6.1",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^3.0.1",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1",
     "stats-webpack-plugin": "^0.7.0"
   }
 }

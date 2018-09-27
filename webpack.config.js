@@ -46,7 +46,7 @@ const clientConfig = {
   target: 'web',
   mode: nodeEnv,
   entry: {
-    main: './src/client.js'
+    main: './src/client/index.js'
   },
   output: {
     path: config.paths.distClient,
@@ -94,7 +94,7 @@ const serverConfig = {
   target: 'node',
   mode: config.isProd ? 'none' : 'development',
   entry: {
-    server: './src/server.js'
+    server: './src/server/index.js'
   },
   output: {
     path: config.paths.distServer,
