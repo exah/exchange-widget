@@ -2,6 +2,12 @@ const identity = (val) => val
 const noop = () => undefined
 const toArray = (src) => src == null ? [] : [].concat(src)
 
+const createScopeTypes = (scope) => (...types) =>
+  types.reduce((acc, type) => ({
+    ...acc,
+    [type]: scope + '/' + type
+  }), {})
+
 const getIndent = (lines) => {
   const lengths = lines
     .filter(line => line.trim().length !== 0)
@@ -37,6 +43,7 @@ const dedent = (strings, ...values) => {
 }
 
 export {
+  createScopeTypes,
   dedent,
   noop,
   identity

@@ -1,21 +1,22 @@
 import { createAction } from 'redux-actions'
 import { createSelector } from 'reselect'
-import { identity, noop } from '../utils'
+import { identity, noop, createScopeTypes } from '../utils'
 
-const SCOPE = '@exchange/'
 import {
   EVENT_EXCHANGE_RATES,
   EVENT_EXCHANGE_RATES_FOR_CURRENCY
 } from '../constants'
 
-const TYPES = {
-  RESET: SCOPE + 'RESET',
-  RECIEVE_RATES: SCOPE + 'RECIEVE_RATES',
-  UPDATE_VALUE: SCOPE + 'UPDATE_VALUE',
-  UPDATE_BASE_CURRENCY: SCOPE + 'UPDATE_BASE_CURRENCY',
-  UPDATE_FROM_CURRENCY: SCOPE + 'UPDATE_FROM_CURRENCY',
-  UPDATE_TO_CURRENCY: SCOPE + 'UPDATE_TO_CURRENCY'
-}
+const scopeTypes = createScopeTypes('@exchange')
+
+const TYPES = scopeTypes(
+  'RESET',
+  'RECIEVE_RATES',
+  'UPDATE_VALUE',
+  'UPDATE_BASE_CURRENCY',
+  'UPDATE_FROM_CURRENCY',
+  'UPDATE_TO_CURRENCY'
+)
 
 //
 // Reducer
