@@ -18,6 +18,9 @@ class ExchangeView extends Component {
       value: e.currentTarget.value
     })
   }
+  handleSwitchCurrencyClick = (e) => {
+    this.props.switchExchangeCurrencies()
+  }
   componentDidMount () {
     const {
       updateExchangeFromCurrency,
@@ -75,6 +78,11 @@ class ExchangeView extends Component {
             onChange={this.handleExchangeValueChange(toCurrency)}
           />
         </div>
+        <div>
+          <button type='button' onClick={this.handleSwitchCurrencyClick}>
+            switch
+          </button>
+        </div>
       </div>
     )
   }
@@ -90,6 +98,7 @@ export default compose(
       rate: exchange.getRate
     }),
     (dispatch) => bindActionCreators({
+      switchExchangeCurrencies: actions.switchExchangeCurrencies,
       updateExchangeFromCurrency: actions.updateExchangeFromCurrency,
       updateExchangeToCurrency: actions.updateExchangeToCurrency,
       watchExchangeRatesFor: actions.watchExchangeRatesFor,

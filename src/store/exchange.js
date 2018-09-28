@@ -15,7 +15,8 @@ const TYPES = scopeTypes(
   'UPDATE_VALUE',
   'UPDATE_BASE_CURRENCY',
   'UPDATE_FROM_CURRENCY',
-  'UPDATE_TO_CURRENCY'
+  'UPDATE_TO_CURRENCY',
+  'SWITCH_CURRENCIES'
 )
 
 //
@@ -65,6 +66,13 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
         currency: action.payload.currency
       }
     }
+    case TYPES.SWITCH_CURRENCIES: {
+      return {
+        ...state,
+        fromCurrency: state.toCurrency,
+        toCurrency: state.fromCurrency
+      }
+    }
     case TYPES.UPDATE_VALUE: {
       if (action.payload.value < 0) return state
       return {
@@ -93,6 +101,7 @@ const updateExchangeToCurrency = createAction(TYPES.UPDATE_TO_CURRENCY)
 const updateExchangeCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
 const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
 const resetExchangeState = createAction(TYPES.RESET)
+const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
 
 const watchExchangeRatesFor = ({ currency, interval }) => (dispatch, getState, { socket }) => {
   if (socket) {
@@ -162,6 +171,7 @@ export {
   updateExchangeCurrency,
   updateExchangeValue,
   resetExchangeState,
+  switchExchangeCurrencies,
   watchExchangeRatesFor,
   getSelectors
 }
