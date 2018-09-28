@@ -1,9 +1,12 @@
 import { createAction } from 'redux-actions'
 import { createSelector } from 'reselect'
-import { EVENT_EXCHANGE_RATES, EVENT_USER_EXCHANGE_CURRENCY } from '../constants'
 import { identity, noop } from '../utils'
 
 const SCOPE = '@exchange/'
+import {
+  EVENT_EXCHANGE_RATES,
+  EVENT_EXCHANGE_RATES_FOR_CURRENCY
+} from '../constants'
 
 const TYPES = {
   RESET: SCOPE + 'RESET',
@@ -90,14 +93,12 @@ const updateExchangeCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
 const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
 const resetExchangeState = createAction(TYPES.RESET)
 
-const updateAndEmitExchangeToCurrency = (currency) => (dispatch, getState, { socket }) => {
-  dispatch(updateExchangeToCurrency({ currency }))
-  socket.emit(EVENT_USER_EXCHANGE_CURRENCY, currency)
-}
-
-const watchExchangeRatesChanges = () => (dispatch, getState, { socket }) => {
+const watchExchangeRatesFor = ({ currency, interval }) => (dispatch, getState, { socket }) => {
   if (socket) {
+    socket.emit(EVENT_EXCHANGE_RATES_FOR_CURRENCY, { currency, interval })
+
     const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
+
     socket.on(EVENT_EXCHANGE_RATES, listener)
     return () => socket.removeListener(EVENT_EXCHANGE_RATES, listener)
   }
@@ -160,8 +161,7 @@ export {
   updateExchangeCurrency,
   updateExchangeValue,
   resetExchangeState,
-  updateAndEmitExchangeToCurrency,
-  watchExchangeRatesChanges,
+  watchExchangeRatesFor,
   getSelectors
 }
 

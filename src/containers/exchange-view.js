@@ -5,22 +5,40 @@ import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
+import { noop } from '../utils'
 
 class ExchangeView extends Component {
-  componentDidMount () {
-    const { updateAndEmitExchangeToCurrency, watchExchangeRatesChanges } = this.props
-
-    updateAndEmitExchangeToCurrency('GBP')
-    this.stopWatchExchangeRatesChanges = watchExchangeRatesChanges()
+  stopWatchRates = noop
+  watchRatesFor = (currency) => {
+    this.stopWatchRates = this.props.watchExchangeRatesFor({ currency })
   }
-  componentWillUnmount () {
-    this.stopWatchExchangeRatesChanges()
-  }
-  handleChange = (currency) => (e) => {
+  handleExchangeValueChange = (currency) => (e) => {
     this.props.updateExchangeValue({
       currency,
       value: e.currentTarget.value
     })
+  }
+  componentDidMount () {
+    const {
+      updateExchangeFromCurrency,
+      updateExchangeToCurrency,
+      defaultToCurrency,
+      defaultFromCurrency
+    } = this.props
+
+    updateExchangeFromCurrency({ currency: defaultFromCurrency })
+    updateExchangeToCurrency({ currency: defaultToCurrency })
+
+    this.watchRatesFor(defaultToCurrency)
+  }
+  componentDidUpdate (prevProps) {
+    if (prevProps.toCurrency !== this.props.toCurrency) {
+      this.stopWatchRates()
+      this.watchRatesFor(this.props.toCurrency)
+    }
+  }
+  componentWillUnmount () {
+    this.stopWatchRates()
   }
   render () {
     const {
@@ -40,7 +58,7 @@ class ExchangeView extends Component {
             value={fromValue}
             placeholder={0}
             min={0}
-            onChange={this.handleChange(fromCurrency)}
+            onChange={this.handleExchangeValueChange(fromCurrency)}
             autoFocus
           />
         </div>
@@ -54,7 +72,7 @@ class ExchangeView extends Component {
             value={toValue}
             placeholder={0}
             min={0}
-            onChange={this.handleChange(toCurrency)}
+            onChange={this.handleExchangeValueChange(toCurrency)}
           />
         </div>
       </div>
@@ -72,10 +90,10 @@ export default compose(
       rate: exchange.getRate
     }),
     (dispatch) => bindActionCreators({
-      updateAndEmitExchangeToCurrency: actions.updateAndEmitExchangeToCurrency,
-      watchExchangeRatesChanges: actions.watchExchangeRatesChanges,
-      updateExchangeValue: actions.updateExchangeValue,
-      updateExchangeToCurrency: actions.updateExchangeToCurrency
+      updateExchangeFromCurrency: actions.updateExchangeFromCurrency,
+      updateExchangeToCurrency: actions.updateExchangeToCurrency,
+      watchExchangeRatesFor: actions.watchExchangeRatesFor,
+      updateExchangeValue: actions.updateExchangeValue
     }, dispatch)
   )
 )(ExchangeView)

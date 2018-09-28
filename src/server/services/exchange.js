@@ -1,25 +1,42 @@
-import { EVENT_USER_EXCHANGE_CURRENCY, EVENT_EXCHANGE_RATES } from '../../constants'
+import { EVENT_EXCHANGE_RATES_FOR_CURRENCY, EVENT_EXCHANGE_RATES } from '../../constants'
+import { noop } from '../../utils'
 
 import rates1 from '../../data/exchange-rates-1.json'
 import rates2 from '../../data/exchange-rates-2.json'
 
+function subscribeToRates (socket) {
+  const state = {
+    currency: null
+  }
+
+  function watchRates (currency, interval = 2000) {
+    let i = 0
+    const id = setInterval(() => {
+      i++
+      socket.emit(EVENT_EXCHANGE_RATES, i % 2 === 0 ? rates1 : rates2)
+    }, interval)
+
+    return () => clearInterval(id)
+  }
+
+  let stopWatchRates = noop
+  socket.on(EVENT_EXCHANGE_RATES_FOR_CURRENCY, function currencyListener ({ currency, interval }) {
+    if (state.currency !== currency) {
+      stopWatchRates()
+      state.currency = currency
+      stopWatchRates = watchRates(currency, interval)
+    }
+  })
+
+  return stopWatchRates
+}
+
 export default function exchangeService (io) {
   io.on('connection', (socket) => {
-    let intervalId
-    let i = 0
-
-    socket.on(EVENT_USER_EXCHANGE_CURRENCY, (currency) => {
-      socket.emit(EVENT_EXCHANGE_RATES, rates1)
-
-      intervalId = setInterval(() => {
-        i++
-        socket.emit(EVENT_EXCHANGE_RATES, i % 2 === 0 ? rates1 : rates2)
-      }, 2000)
-    })
+    const unsubscribeFromRates = subscribeToRates(socket)
 
     socket.on('disconnect', (reason) => {
-      i = 0
-      clearInterval(intervalId)
+      unsubscribeFromRates()
     })
   })
 

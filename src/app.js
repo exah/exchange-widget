@@ -5,7 +5,10 @@ import ExchangeView from './containers/exchange-view'
 class App extends Component {
   render () {
     return (
-      <ExchangeView />
+      <ExchangeView
+        defaultFromCurrency='USD' // this should come from user action
+        defaultToCurrency='GBP'
+      />
     )
   }
 }
