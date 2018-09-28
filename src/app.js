@@ -1,12 +1,11 @@
 import { hot } from 'react-hot-loader'
 import React, { Component } from 'react'
+import ExchangeView from './containers/exchange-view'
 
 class App extends Component {
   render () {
     return (
-      <div>
-        Hello World
-      </div>
+      <ExchangeView />
     )
   }
 }
