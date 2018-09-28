@@ -1,11 +1,14 @@
 const config = require('config')
+const http = require('http')
 const express = require('express')
+const createIO = require('socket.io')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const webpackUniversalAndHot = require('@exah/webpack-universal-hot-middleware')
-const webpackConfig = require(config.paths.root + '/webpack.config.js')
-const sample = require('../data/latest.json')
-const app = require('./create-app')
+
+const app = express()
+const server = http.createServer(app)
+const io = createIO(server)
 
 app.use(bodyParser.json())
 app.use(compression({ threshold: 0 }))
@@ -15,20 +18,18 @@ app.use(express.static(config.paths.public, {
 }))
 
 app.use(webpackUniversalAndHot({
-  webpackConfig,
+  webpackConfig: require(config.paths.root + '/webpack.config.js'),
   isDev: config.isDev,
   isHot: true,
   clientEntry: 'main',
   serverEntry: 'server',
   clientStatsFileName: 'clientStats.json',
-  serverStatsFileName: 'serverStats.json'
+  serverStatsFileName: 'serverStats.json',
+  getServerRendererOptions: (data) => ({ ...data, app, io, server })
 }))
 
-app.io.on('connection', (socket) => {
-  socket.on('exchange-currency', (currency) => {
-    console.log('exchange-currency', currency)
-    socket.emit('exchange-rates', sample)
-  })
-})
-
-module.exports = app
+module.exports = {
+  app,
+  io,
+  server
+}

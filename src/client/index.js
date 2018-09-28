@@ -4,13 +4,9 @@ import ReactDOM from 'react-dom'
 import { hydrateData } from 'react-universal-data'
 import { Provider as ReduxProvider } from 'react-redux'
 import { hydrate as hydrateCSS } from 'emotion'
-import socket from '../api/client-socket'
 import createStore from '../store'
 import App from '../app'
-
-// Socket
-socket.emit('exchange-currency', 'USD')
-socket.on('exchange-rates', (data) => console.log(data))
+import socket from './socket'
 
 // Get server state
 const { cssIds, intialState, initialData } = (window._ssr || {})

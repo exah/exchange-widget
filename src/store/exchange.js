@@ -1,11 +1,14 @@
 import { createAction } from 'redux-actions'
 import { createSelector } from 'reselect'
+import { EVENT_EXCHANGE_RATES, EVENT_USER_EXCHANGE_CURRENCY } from '../constants'
+import { identity, noop } from '../utils'
 
 const SCOPE = '@exchange/'
+
 const TYPES = {
   RESET: SCOPE + 'RESET',
   RECIEVE_RATES: SCOPE + 'RECIEVE_RATES',
-  UPDATE_BASE_VALUE: SCOPE + 'UPDATE_BASE_VALUE',
+  UPDATE_VALUE: SCOPE + 'UPDATE_VALUE',
   UPDATE_BASE_CURRENCY: SCOPE + 'UPDATE_BASE_CURRENCY',
   UPDATE_FROM_CURRENCY: SCOPE + 'UPDATE_FROM_CURRENCY',
   UPDATE_TO_CURRENCY: SCOPE + 'UPDATE_TO_CURRENCY'
@@ -23,6 +26,9 @@ const INITIAL_STATE = {
   fromCurrency: 'USD',
   toCurrency: 'USD'
 }
+
+const round = (num) =>
+  !num && num !== 0 ? '' : Math.floor(Number(num) * 100) / 100
 
 function exchangeReducer (state = INITIAL_STATE, action = {}) {
   const baseState = {
@@ -49,10 +55,17 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
         toCurrency: action.payload.currency
       }
     }
-    case TYPES.UPDATE_BASE_VALUE: {
+    case TYPES.UPDATE_BASE_CURRENCY: {
       return {
         ...state,
-        value: action.payload.value,
+        currency: action.payload.currency
+      }
+    }
+    case TYPES.UPDATE_VALUE: {
+      if (action.payload.value < 0) return state
+      return {
+        ...state,
+        value: round(action.payload.value),
         currency: action.payload.currency
       }
     }
@@ -71,54 +84,85 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
 //
 
 const recieveExchangeRates = createAction(TYPES.RECIEVE_RATES)
-const updateExchangeCurrency = createAction(TYPES.UPDATE_FROM_CURRENCY)
-const updateExchangeValue = createAction(TYPES.UPDATE_BASE_VALUE)
+const updateExchangeFromCurrency = createAction(TYPES.UPDATE_FROM_CURRENCY)
+const updateExchangeToCurrency = createAction(TYPES.UPDATE_TO_CURRENCY)
+const updateExchangeCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
+const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
 const resetExchangeState = createAction(TYPES.RESET)
+
+const updateAndEmitExchangeToCurrency = (currency) => (dispatch, getState, { socket }) => {
+  dispatch(updateExchangeToCurrency({ currency }))
+  socket.emit(EVENT_USER_EXCHANGE_CURRENCY, currency)
+}
+
+const watchExchangeRatesChanges = () => (dispatch, getState, { socket }) => {
+  if (socket) {
+    const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
+    socket.on(EVENT_EXCHANGE_RATES, listener)
+    return () => socket.removeListener(EVENT_EXCHANGE_RATES, listener)
+  }
+
+  return noop
+}
 
 //
 // Selectors
 //
 
-const exchangeRates = state => state.rates || {}
-const exchangeValue = state => state.value || 0
-const exchangeCurrency = state => state.currency
-const exchangeFromCurrency = state => state.fromCurrency
-const exchangeToCurrency = state => state.toCurrency
+function getSelectors (getState = identity) {
+  const getRates = createSelector(getState, state => state.rates || {})
+  const getValue = createSelector(getState, state => round(state.value))
+  const getCurrency = createSelector(getState, state => state.currency)
+  const getFromCurrency = createSelector(getState, state => state.fromCurrency)
+  const getToCurrency = createSelector(getState, state => state.toCurrency)
 
-const exchangeRate = createSelector(
-  exchangeRates,
-  exchangeToCurrency,
-  (rates, currency) => rates[currency]
-)
+  const getRate = createSelector(
+    getRates,
+    getToCurrency,
+    (rates, currency) => {
+      const rate = rates[currency]
+      return Number(rate != null && rate)
+    }
+  )
 
-const exchangeValueSelector = (...selectors) => createSelector(
-  exchangeRate,
-  exchangeCurrency,
-  exchangeValue,
-  ...selectors
-)
+  const getValueSelector = (...otherSelectors) => createSelector(
+    getRate,
+    getCurrency,
+    getValue,
+    ...otherSelectors
+  )
 
-const exchangeFromValue = exchangeValueSelector(
-  exchangeFromCurrency,
-  (rate, currency, value, base) => currency === base ? value : value / rate
-)
+  const getFromValue = getValueSelector(
+    getFromCurrency,
+    (rate, currency, value, base) => currency === base ? value : round(value / rate)
+  )
 
-const exchangeToValue = exchangeValueSelector(
-  exchangeToCurrency,
-  (rate, currency, value, base) => currency === base ? value : value * rate
-)
+  const getToValue = getValueSelector(
+    getToCurrency,
+    (rate, currency, value, base) => currency === base ? value : round(value * rate)
+  )
+
+  return {
+    getFromCurrency,
+    getToCurrency,
+    getCurrency,
+    getValue,
+    getRate,
+    getFromValue,
+    getToValue
+  }
+}
 
 export {
   recieveExchangeRates,
+  updateExchangeFromCurrency,
+  updateExchangeToCurrency,
   updateExchangeCurrency,
   updateExchangeValue,
   resetExchangeState,
-  exchangeFromCurrency,
-  exchangeToCurrency,
-  exchangeCurrency,
-  exchangeValue,
-  exchangeFromValue,
-  exchangeToValue
+  updateAndEmitExchangeToCurrency,
+  watchExchangeRatesChanges,
+  getSelectors
 }
 
 export default exchangeReducer
