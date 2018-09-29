@@ -5,7 +5,6 @@ import * as actions from '../exchange'
 const getIntialState = (state) => ({
   exchange: {
     rates: { GBP: 0.5, USD: 1 },
-    availableCurrencies: [ 'USD' ],
     value: 1,
     currency: 'USD',
     fromCurrency: 'USD',

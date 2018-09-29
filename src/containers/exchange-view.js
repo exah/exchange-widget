@@ -3,6 +3,7 @@ import { compose } from 'recompose'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
+import { withData } from 'react-universal-data'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
 import { noop } from '../utils'
@@ -22,22 +23,13 @@ class ExchangeView extends Component {
     this.props.switchExchangeCurrencies()
   }
   componentDidMount () {
-    const {
-      updateExchangeFromCurrency,
-      updateExchangeToCurrency,
-      defaultToCurrency,
-      defaultFromCurrency
-    } = this.props
-
-    updateExchangeFromCurrency({ currency: defaultFromCurrency })
-    updateExchangeToCurrency({ currency: defaultToCurrency })
-
-    this.watchRatesFor(defaultToCurrency)
+    const { fromCurrency } = this.props
+    this.watchRatesFor(fromCurrency)
   }
   componentDidUpdate (prevProps) {
     if (prevProps.toCurrency !== this.props.toCurrency) {
       this.stopWatchRates()
-      this.watchRatesFor(this.props.toCurrency)
+      this.watchRatesFor(this.props.fromCurrency)
     }
   }
   componentWillUnmount () {
@@ -101,8 +93,19 @@ export default compose(
       switchExchangeCurrencies: actions.switchExchangeCurrencies,
       updateExchangeFromCurrency: actions.updateExchangeFromCurrency,
       updateExchangeToCurrency: actions.updateExchangeToCurrency,
+      updateExchangeValue: actions.updateExchangeValue,
       watchExchangeRatesFor: actions.watchExchangeRatesFor,
-      updateExchangeValue: actions.updateExchangeValue
+      getRatesFor: actions.getRatesFor
     }, dispatch)
+  ),
+  withData(
+    (props) => {
+      props.updateExchangeFromCurrency({ currency: props.defaultFromCurrency })
+      props.updateExchangeToCurrency({ currency: props.defaultToCurrency })
+      return props.getRatesFor(props.defaultFromCurrency)
+        .then(() => ({ isSuccess: true }))
+        .catch((error) => ({ error: error.message }))
+    },
+    () => false
   )
 )(ExchangeView)

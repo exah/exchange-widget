@@ -1,37 +1,45 @@
-import { EVENT_EXCHANGE_RATES_FOR_CURRENCY, EVENT_EXCHANGE_RATES } from '../../constants'
-import { noop } from '../../utils'
+import express from 'express'
+import * as oxcr from '../../api/oxcr'
 
-import rates1 from '../../data/exchange-rates-1.json'
-import rates2 from '../../data/exchange-rates-2.json'
+import {
+  API_GET_RATES,
+  EVENT_EXCHANGE_RATES_FOR_CURRENCY,
+  EVENT_EXCHANGE_RATES
+} from '../../constants'
 
 function subscribeToRates (socket) {
   const state = {
-    currency: null
+    currency: null,
+    timer: null
   }
 
-  function watchRates (currency, interval = 2000) {
-    let i = 0
-    const id = setInterval(() => {
-      i++
-      socket.emit(EVENT_EXCHANGE_RATES, i % 2 === 0 ? rates1 : rates2)
-    }, interval)
+  const stopTimer = () => clearTimeout(state.timer)
+  socket.on(
+    EVENT_EXCHANGE_RATES_FOR_CURRENCY,
+    function currencyListener ({ currency, interval = 10000 }) {
+      if (state.currency !== currency) {
+        state.currency = currency
+        console.log(state)
 
-    return () => clearInterval(id)
-  }
-
-  let stopWatchRates = noop
-  socket.on(EVENT_EXCHANGE_RATES_FOR_CURRENCY, function currencyListener ({ currency, interval }) {
-    if (state.currency !== currency) {
-      stopWatchRates()
-      state.currency = currency
-      stopWatchRates = watchRates(currency, interval)
+        stopTimer()
+        ;(function repeatGetRates (i) {
+          i++
+          return oxcr.getRates(currency)
+            .then((data) => socket.emit(EVENT_EXCHANGE_RATES, data))
+            .then(() => new Promise((resolve) => { state.timer = setTimeout(resolve, interval) }))
+            .then(() => repeatGetRates(i))
+            .catch((error) => console.error(error))
+        })(0)
+      }
     }
-  })
+  )
 
-  return stopWatchRates
+  return stopTimer
 }
 
 export default function exchangeService (io) {
+  const router = express.Router()
+
   io.on('connection', (socket) => {
     const unsubscribeFromRates = subscribeToRates(socket)
 
@@ -40,7 +48,19 @@ export default function exchangeService (io) {
     })
   })
 
-  return function exchangeMiddleware (req, res, next) {
-    next()
-  }
+  router.get(API_GET_RATES, (req, res, next) => {
+    oxcr.getRates(req.params.currency)
+      .then((data) => res.json({
+        status: 200,
+        message: 'ok',
+        data: data.rates
+      }))
+      .catch((error) => res.status(error.status).json({
+        status: error.status,
+        message: error.message,
+        data: null
+      }))
+  })
+
+  return router
 }

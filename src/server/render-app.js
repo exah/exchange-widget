@@ -43,8 +43,8 @@ export default (files) => function renderAppMiddleware (req, res, next) {
       context.status = error.status || 500
       context.statusText = error.statusText || 'Unknown error'
 
-      if (context.status >= 300 && context.status < 400 && error.data.location) {
-        context.url = error.data.location
+      if (context.status >= 300 && context.status < 400 && error.location) {
+        context.url = error.location
       }
 
       return {}
@@ -58,10 +58,6 @@ export default (files) => function renderAppMiddleware (req, res, next) {
         res.redirect(302, context.url)
         console.log(`Redirecting... '${req.path}' -> '${context.url}'`)
         return
-      }
-
-      if (context.status >= 400) {
-        return Promise.reject(new Error(context.statusText))
       }
 
       const app = renderApp(appElement)

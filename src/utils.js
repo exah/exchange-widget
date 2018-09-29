@@ -1,3 +1,5 @@
+import globalFetch from 'isomorphic-unfetch'
+
 const identity = (val) => val
 const noop = () => undefined
 const toArray = (src) => src == null ? [] : [].concat(src)
@@ -7,6 +9,29 @@ const createScopeTypes = (scope) => (...types) =>
     ...acc,
     [type]: scope + '/' + type
   }), {})
+
+const getQuery = (data = {}) => '?' + (
+  Object
+    .keys(data)
+    .map((key) => key + '=' + encodeURIComponent(data[key]))
+    .join('&')
+)
+
+const fetch = (...args) => globalFetch(...args).then((response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return response.json()
+  }
+
+  return response.json().then((data) => {
+    throw Object.assign(new Error(response.statusText), {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      url: response.url,
+      data
+    })
+  })
+})
 
 const getIndent = (lines) => {
   const lengths = lines
@@ -46,5 +71,7 @@ export {
   createScopeTypes,
   dedent,
   noop,
+  fetch,
+  getQuery,
   identity
 }

@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions'
 import { createSelector } from 'reselect'
+import * as exchangeApi from '../api/exchange'
 import { identity, noop, createScopeTypes } from '../utils'
 
 import {
@@ -24,8 +25,7 @@ const TYPES = scopeTypes(
 //
 
 const INITIAL_STATE = {
-  rates: { USD: 1 },
-  availableCurrencies: [ 'USD' ],
+  rates: {},
   value: 1,
   currency: 'USD',
   fromCurrency: 'USD',
@@ -103,6 +103,10 @@ const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
 const resetExchangeState = createAction(TYPES.RESET)
 const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
 
+const getRatesFor = (currency) => (dispatch) =>
+  exchangeApi.getRates(currency)
+    .then((res) => dispatch(recieveExchangeRates({ rates: res.data })))
+
 const watchExchangeRatesFor = ({ currency, interval }) => (dispatch, getState, { socket }) => {
   if (socket) {
     socket.emit(EVENT_EXCHANGE_RATES_FOR_CURRENCY, { currency, interval })
@@ -173,6 +177,7 @@ export {
   resetExchangeState,
   switchExchangeCurrencies,
   watchExchangeRatesFor,
+  getRatesFor,
   getSelectors
 }
 
