@@ -4,6 +4,14 @@ import { Input } from './input'
 import { MediaObject } from './media-object'
 import { themeGet } from '../utils'
 
+const CurrencyContainer = styled('div')`
+  padding-top: 50px;
+  padding-bottom: 50px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: ${(props) => props.alternateColor && themeGet('color.alternate')};
+`
+
 const CurrencyWrapper = styled('div')`
   ${themeGet('textStyle.accent')}
 `
@@ -11,22 +19,32 @@ const CurrencyWrapper = styled('div')`
 const CurrencyWrapperInput = styled(Input)`
   width: 100%;
   text-align: right;
+  color: ${props => themeGet(props.value ? 'color.text' : 'color.faded')};
 
   &::placeholder {
     color: ${themeGet('color.faded')}
   }
 
-  ${(props) => `
-    color: ${!props.value ? themeGet('color.faded') : themeGet('color.text')};
-  `}
+  &:focus {
+    outline: 1px solid ${themeGet('color.focus')};
+  }
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
 `
 
 const BalanceWrapper = styled('div')`
   ${themeGet('textStyle.caption')}
+
+  margin-top: 10px;
   color: ${themeGet('color.faded')}
 `
 
 const CurrencyInput = ({
+  alternateColor,
   currencyCode,
   currencySymbol,
   balance,
@@ -35,13 +53,11 @@ const CurrencyInput = ({
   autoFocus,
   tabIndex
 }) => (
-  <>
+  <CurrencyContainer alternateColor={alternateColor}>
     <CurrencyWrapper>
       <MediaObject>
         <MediaObject.Side>
-          <div>
-            {currencyCode}
-          </div>
+          {currencyCode}
         </MediaObject.Side>
         <MediaObject.Content>
           <CurrencyWrapperInput
@@ -56,9 +72,9 @@ const CurrencyInput = ({
       </MediaObject>
     </CurrencyWrapper>
     <BalanceWrapper>
-      Balance: {balance} {currencySymbol}
+      Balance: {Math.max(balance, 0)} {currencySymbol}
     </BalanceWrapper>
-  </>
+  </CurrencyContainer>
 )
 
 export {

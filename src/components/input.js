@@ -9,12 +9,6 @@ const Input = styled('input')`
   background: none;
   padding: 0;
   margin: 0;
-
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    appearance: none;
-    margin: 0;
-  }
 `
 
 export {
