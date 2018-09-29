@@ -26,14 +26,14 @@ const TYPES = scopeTypes(
 
 const INITIAL_STATE = {
   rates: {},
-  value: 1,
+  value: '',
   currency: 'USD',
   fromCurrency: 'USD',
   toCurrency: 'USD'
 }
 
 const round = (num) =>
-  !num && num !== 0 ? '' : Math.floor(Number(num) * 100) / 100
+  num > 0 ? Math.floor(Number(num) * 100) / 100 : ''
 
 function exchangeReducer (state = INITIAL_STATE, action = {}) {
   const baseState = {
@@ -126,7 +126,7 @@ const watchExchangeRatesFor = ({ currency, interval }) => (dispatch, getState, {
 
 function getSelectors (getState = identity) {
   const getRates = createSelector(getState, state => state.rates || {})
-  const getValue = createSelector(getState, state => round(state.value))
+  const getValue = createSelector(getState, state => state.value)
   const getCurrency = createSelector(getState, state => state.currency)
   const getFromCurrency = createSelector(getState, state => state.fromCurrency)
   const getToCurrency = createSelector(getState, state => state.toCurrency)
