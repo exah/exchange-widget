@@ -10,9 +10,10 @@ import * as actions from '../store/exchange'
 import { noop } from '../utils'
 
 class ExchangeView extends Component {
-  stopWatchRates = noop
-  watchRatesFor = (currency) => {
-    this.stopWatchRates = this.props.watchExchangeRatesFor({ currency })
+  stopGettingLiveRates = noop
+  getLiveRates = (currency) => {
+    this.stopGettingLiveRates()
+    this.stopGettingLiveRates = this.props.getLiveExchangeRates({ currency })
   }
   handleExchangeValueChange = (currency) => (e) => {
     this.props.updateExchangeValue({
@@ -24,34 +25,35 @@ class ExchangeView extends Component {
     this.props.switchExchangeCurrencies()
   }
   componentDidMount () {
-    const { fromCurrency } = this.props
-    this.watchRatesFor(fromCurrency)
+    const { baseCurrency } = this.props
+    this.getLiveRates(baseCurrency)
   }
   componentDidUpdate (prevProps) {
-    if (prevProps.toCurrency !== this.props.toCurrency) {
-      this.stopWatchRates()
-      this.watchRatesFor(this.props.fromCurrency)
+    if (prevProps.targetCurrency !== this.props.targetCurrency) {
+      this.getLiveRates(this.props.baseCurrency)
     }
   }
   componentWillUnmount () {
-    this.stopWatchRates()
+    this.stopGettingLiveRates()
   }
   render () {
     const {
-      fromCurrency,
-      fromValue,
-      toCurrency,
-      toValue,
+      balanceBase,
+      balanceTarget,
+      baseCurrency,
+      baseValue,
+      targetCurrency,
+      targetValue,
       rate
     } = this.props
 
     return (
       <div>
         <CurrencyInput
-          currencyCode={fromCurrency}
-          value={fromValue}
-          balance={1000}
-          onChange={this.handleExchangeValueChange(fromCurrency)}
+          currencyCode={baseCurrency}
+          value={baseValue}
+          balance={(balanceBase - baseValue)}
+          onChange={this.handleExchangeValueChange(baseCurrency)}
           autoFocus
         />
         <div>
@@ -63,11 +65,12 @@ class ExchangeView extends Component {
           </button>
         </div>
         <CurrencyInput
-          currencyCode={toCurrency}
-          value={toValue}
-          balance={1000}
-          onChange={this.handleExchangeValueChange(toCurrency)}
+          currencyCode={targetCurrency}
+          value={targetValue}
+          balance={(balanceTarget + targetValue)}
+          onChange={this.handleExchangeValueChange(targetCurrency)}
           autoFocus
+          alternateColor
         />
       </div>
     )
@@ -77,26 +80,26 @@ class ExchangeView extends Component {
 export default compose(
   connect(
     createStructuredSelector({
-      fromCurrency: exchange.getFromCurrency,
-      toCurrency: exchange.getToCurrency,
-      fromValue: exchange.getFromValue,
-      toValue: exchange.getToValue,
+      baseCurrency: exchange.getBaseCurrency,
+      targetCurrency: exchange.getTargetCurrency,
+      baseValue: exchange.getBaseValue,
+      targetValue: exchange.getTargetValue,
       rate: exchange.getRate
     }),
     (dispatch) => bindActionCreators({
       switchExchangeCurrencies: actions.switchExchangeCurrencies,
-      updateExchangeFromCurrency: actions.updateExchangeFromCurrency,
-      updateExchangeToCurrency: actions.updateExchangeToCurrency,
+      updateExchangeBaseCurrency: actions.updateExchangeBaseCurrency,
+      updateExchangeTargetCurrency: actions.updateExchangeTargetCurrency,
       updateExchangeValue: actions.updateExchangeValue,
-      watchExchangeRatesFor: actions.watchExchangeRatesFor,
-      getRatesFor: actions.getRatesFor
+      getLiveExchangeRates: actions.getLiveExchangeRates,
+      getExchangeRates: actions.getExchangeRates
     }, dispatch)
   ),
   withData(
     (props) => {
-      props.updateExchangeFromCurrency({ currency: props.defaultFromCurrency })
-      props.updateExchangeToCurrency({ currency: props.defaultToCurrency })
-      return props.getRatesFor(props.defaultFromCurrency)
+      props.updateExchangeBaseCurrency({ currency: props.defaultBaseCurrency })
+      props.updateExchangeTargetCurrency({ currency: props.defaultTargetCurrency })
+      return props.getExchangeRates(props.defaultBaseCurrency)
         .then(() => ({ isSuccess: true }))
         .catch((error) => ({ error: error.message }))
     },

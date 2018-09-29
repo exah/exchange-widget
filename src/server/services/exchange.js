@@ -3,8 +3,8 @@ import * as ratesApi from '../../api/rates-api'
 
 import {
   API_GET_RATES,
-  EVENT_EXCHANGE_RATES_FOR_CURRENCY,
-  EVENT_EXCHANGE_RATES
+  API_SOCKET_REQUEST_LIVE_RATES,
+  API_SOCKET_GET_LIVE_RATES
 } from '../../constants'
 
 import { createLogger } from '../../utils'
@@ -19,7 +19,7 @@ function subscribeToRates (socket) {
 
   const stopTimer = () => clearTimeout(state.timer)
   socket.on(
-    EVENT_EXCHANGE_RATES_FOR_CURRENCY,
+    API_SOCKET_REQUEST_LIVE_RATES,
     function currencyListener ({ currency, interval = 10000 }) {
       if (state.currency !== currency) {
         state.currency = currency
@@ -30,7 +30,7 @@ function subscribeToRates (socket) {
           i++
           return ratesApi.getLatest(currency)
             .then((data) => {
-              socket.emit(EVENT_EXCHANGE_RATES, data)
+              socket.emit(API_SOCKET_GET_LIVE_RATES, data)
               logger.info('Emit rates')
             })
             .then(() => new Promise((resolve) => { state.timer = setTimeout(resolve, interval) }))

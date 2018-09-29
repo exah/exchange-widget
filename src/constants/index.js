@@ -2,8 +2,8 @@ export const DEBUG_SCOPE = 'exchange-widget'
 
 export const API_GET_RATES = '/api/rates/:currency'
 export const RATES_API_GET_LATEST = '/api/latest'
-export const EVENT_EXCHANGE_RATES_FOR_CURRENCY = 'exchange-rates-for-currency'
-export const EVENT_EXCHANGE_RATES = 'exchange-rates'
+export const API_SOCKET_REQUEST_LIVE_RATES = 'exchange-rates.live.request'
+export const API_SOCKET_GET_LIVE_RATES = 'exchange-rates.live.get'
 
 export const THEME_COLORS = {
   text: '#000',
