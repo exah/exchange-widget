@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'react-emotion'
 import { Input } from './input'
 import { MediaObject } from './media-object'
-import { themeGet } from '../utils'
+import { themeGet, getCurrencySymbol } from '../utils'
 
 const CurrencyContainer = styled('div')`
   padding-top: 50px;
@@ -46,7 +46,6 @@ const BalanceWrapper = styled('div')`
 const CurrencyInput = ({
   alternateColor,
   currencyCode,
-  currencySymbol,
   balance,
   value,
   onChange,
@@ -72,7 +71,7 @@ const CurrencyInput = ({
       </MediaObject>
     </CurrencyWrapper>
     <BalanceWrapper>
-      Balance: {Math.max(balance, 0)} {currencySymbol}
+      Balance: {Math.max(balance, 0)} {getCurrencySymbol(currencyCode)}
     </BalanceWrapper>
   </CurrencyContainer>
 )

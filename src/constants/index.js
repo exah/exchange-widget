@@ -5,6 +5,12 @@ export const RATES_API_GET_LATEST = '/api/latest'
 export const API_SOCKET_REQUEST_LIVE_RATES = 'exchange-rates.live.request'
 export const API_SOCKET_GET_LIVE_RATES = 'exchange-rates.live.get'
 
+export const CURRENCY_SYMBOLS = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£'
+}
+
 export const THEME_COLORS = {
   text: '#000',
   accent: '#1880EE',
