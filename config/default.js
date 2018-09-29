@@ -10,17 +10,15 @@ const host = process.env.HOST || '0.0.0.0'
 const port = process.env.PORT || 3000
 const siteUrl = process.env.SITE_URL || `http://${host}:${port}`
 const scale = JSON.parse(process.env.SCALE || null)
-const oxcrApiUrl = process.env.OXCR_API_URL || 'https://openexchangerates.org'
-const oxcrAppId = process.env.OXCR_APP_ID
+const ratesApiUrl = process.env.RATES_API_URL || 'https://ratesapi.io'
 
 const config = {
   host,
   port,
   siteUrl,
   scale,
-  oxcr: {
-    appId: oxcrAppId,
-    apiUrl: oxcrApiUrl
+  rates: {
+    apiUrl: ratesApiUrl
   },
   paths: {
     root: resolvePath(),

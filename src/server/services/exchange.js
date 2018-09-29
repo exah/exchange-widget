@@ -1,11 +1,15 @@
 import express from 'express'
-import * as oxcr from '../../api/oxcr'
+import * as ratesApi from '../../api/rates-api'
 
 import {
   API_GET_RATES,
   EVENT_EXCHANGE_RATES_FOR_CURRENCY,
   EVENT_EXCHANGE_RATES
 } from '../../constants'
+
+import { createLogger } from '../../utils'
+
+const logger = createLogger('service')
 
 function subscribeToRates (socket) {
   const state = {
@@ -19,16 +23,19 @@ function subscribeToRates (socket) {
     function currencyListener ({ currency, interval = 10000 }) {
       if (state.currency !== currency) {
         state.currency = currency
-        console.log(state)
+        logger.info('Currency:', state.currency)
 
         stopTimer()
         ;(function repeatGetRates (i) {
           i++
-          return oxcr.getRates(currency)
-            .then((data) => socket.emit(EVENT_EXCHANGE_RATES, data))
+          return ratesApi.getLatest(currency)
+            .then((data) => {
+              socket.emit(EVENT_EXCHANGE_RATES, data)
+              logger.info('Emit rates')
+            })
             .then(() => new Promise((resolve) => { state.timer = setTimeout(resolve, interval) }))
             .then(() => repeatGetRates(i))
-            .catch((error) => console.error(error))
+            .catch((error) => console.error(error)) // TODO: Send error to client
         })(0)
       }
     }
@@ -49,7 +56,7 @@ export default function exchangeService (io) {
   })
 
   router.get(API_GET_RATES, (req, res, next) => {
-    oxcr.getRates(req.params.currency)
+    ratesApi.getLatest(req.params.currency)
       .then((data) => res.json({
         status: 200,
         message: 'ok',

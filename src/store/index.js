@@ -1,6 +1,8 @@
+import config from 'config'
 import { createStore, applyMiddleware } from 'redux'
 import reduxLogdown from 'redux-logdown'
 import thunk from 'redux-thunk'
+import { DEBUG_SCOPE } from '../constants'
 import reducers from './reducers'
 
 export default (intialState, socket) => {
@@ -9,7 +11,7 @@ export default (intialState, socket) => {
     intialState,
     applyMiddleware(
       thunk.withExtraArgument({ socket }),
-      reduxLogdown('exchange-widget:store', { diff: true })
+      reduxLogdown(DEBUG_SCOPE + ':store', { diff: config.isClient })
     )
   )
 

@@ -1,8 +1,12 @@
 import globalFetch from 'isomorphic-unfetch'
+import logdown from 'logdown'
+import { DEBUG_SCOPE } from './constants'
 
 const identity = (val) => val
 const noop = () => undefined
 const toArray = (src) => src == null ? [] : [].concat(src)
+
+const createLogger = (scope) => logdown(DEBUG_SCOPE + ':' + scope)
 
 const createScopeTypes = (scope) => (...types) =>
   types.reduce((acc, type) => ({
@@ -13,7 +17,11 @@ const createScopeTypes = (scope) => (...types) =>
 const getQuery = (data = {}) => '?' + (
   Object
     .keys(data)
-    .map((key) => key + '=' + encodeURIComponent(data[key]))
+    .reduce((acc, key) => {
+      const value = data[key]
+      if (value == null) return acc
+      return acc.concat(key + '=' + encodeURIComponent(value))
+    }, [])
     .join('&')
 )
 
@@ -69,6 +77,7 @@ const dedent = (strings, ...values) => {
 
 export {
   createScopeTypes,
+  createLogger,
   dedent,
   noop,
   fetch,

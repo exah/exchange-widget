@@ -149,12 +149,14 @@ function getSelectors (getState = identity) {
 
   const getFromValue = getValueSelector(
     getFromCurrency,
-    (rate, currency, value, base) => currency === base ? value : round(value / rate)
+    (rate, currency, value, base) =>
+      currency === base || rate === 0 ? value : round(value / rate)
   )
 
   const getToValue = getValueSelector(
     getToCurrency,
-    (rate, currency, value, base) => currency === base ? value : round(value * rate)
+    (rate, currency, value, base) =>
+      currency === base ? value : round(value * rate)
   )
 
   return {
