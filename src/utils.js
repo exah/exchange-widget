@@ -8,6 +8,25 @@ const toArray = (src) => src == null ? [] : [].concat(src)
 
 const createLogger = (scope) => logdown(DEBUG_SCOPE + ':' + scope)
 
+const path = (input, src, fallback) => {
+  const paths = typeof input === 'string' ? input.split('.') : toArray(input)
+  let val = src
+  let idx = 0
+
+  while (idx < paths.length) {
+    val = val[paths[idx]]
+    idx += 1
+
+    if (val == null) {
+      return fallback
+    }
+  }
+
+  return val === src ? fallback : val
+}
+
+const themeGet = (input) => (props) => path(input, props.theme)
+
 const createScopeTypes = (scope) => (...types) =>
   types.reduce((acc, type) => ({
     ...acc,
@@ -78,6 +97,8 @@ const dedent = (strings, ...values) => {
 export {
   createScopeTypes,
   createLogger,
+  themeGet,
+  path,
   dedent,
   noop,
   fetch,

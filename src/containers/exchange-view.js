@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { withData } from 'react-universal-data'
+import { CurrencyInput } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
 import { noop } from '../utils'
@@ -46,35 +47,28 @@ class ExchangeView extends Component {
 
     return (
       <div>
-        <div>
-          <div>From {fromCurrency}</div>
-          <input
-            type='number'
-            value={fromValue}
-            placeholder={0}
-            min={0}
-            onChange={this.handleExchangeValueChange(fromCurrency)}
-            autoFocus
-          />
-        </div>
+        <CurrencyInput
+          currencyCode={fromCurrency}
+          value={fromValue}
+          balance={1000}
+          onChange={this.handleExchangeValueChange(fromCurrency)}
+          autoFocus
+        />
         <div>
           Rate: {rate}
         </div>
         <div>
-          <div>To {toCurrency}</div>
-          <input
-            type='number'
-            value={toValue}
-            placeholder={0}
-            min={0}
-            onChange={this.handleExchangeValueChange(toCurrency)}
-          />
-        </div>
-        <div>
-          <button type='button' onClick={this.handleSwitchCurrencyClick}>
+          <button type='button' onClick={this.handleSwitchCurrencyClick} tabIndex={-1}>
             switch
           </button>
         </div>
+        <CurrencyInput
+          currencyCode={toCurrency}
+          value={toValue}
+          balance={1000}
+          onChange={this.handleExchangeValueChange(toCurrency)}
+          autoFocus
+        />
       </div>
     )
   }
