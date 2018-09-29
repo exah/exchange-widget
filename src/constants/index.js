@@ -7,10 +7,12 @@ export const API_SOCKET_GET_LIVE_RATES = 'exchange-rates.live.get'
 
 export const THEME_COLORS = {
   text: '#000',
-  faded: 'rgba(0, 0, 0, 0.5)',
   accent: '#1880EE',
   highlight: '#E63FA5',
-  bg: 'rgba(0, 0, 0, 0.93)'
+  bg: '#fff',
+  focus: 'rgba(0, 0, 0, 0.2)',
+  faded: 'rgba(0, 0, 0, 0.5)',
+  alternate: 'rgba(0, 0, 0, 0.07)'
 }
 
 export const THEME_TEXT_STYLES = {
@@ -30,11 +32,17 @@ export const THEME_TEXT_STYLES = {
   },
   caption: {
     fontSize: '0.8rem',
-    fontWeight: 300
+    fontWeight: 400
   }
+}
+
+export const THEME_SIZE = {
+  default: 34,
+  big: 55
 }
 
 export const THEME = {
   color: THEME_COLORS,
-  textStyle: THEME_TEXT_STYLES
+  textStyle: THEME_TEXT_STYLES,
+  size: THEME_SIZE
 }
