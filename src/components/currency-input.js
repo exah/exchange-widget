@@ -25,10 +25,6 @@ const CurrencyWrapperInput = styled(Input)`
     color: ${themeGet('color.faded')}
   }
 
-  &:focus {
-    outline: 1px solid ${themeGet('color.focus')};
-  }
-
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
     appearance: none;

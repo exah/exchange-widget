@@ -13,6 +13,9 @@ class App extends Component {
       :root {
         ${THEME.textStyle.root}
       }
+      :focus {
+        outline: 1px solid ${THEME.color.focus};
+      }
     `
   }
   render () {
