@@ -22,6 +22,28 @@ $ yarn start
 $ open http://0.0.0.0:3000
 ```
 
+
+## Config
+
+### Server environment variables
+
+| name            | default                  | description 
+|:----------------|:-------------------------|:---------------------------------
+| `NODE_ENV`      | —                        | Used switching between `production`, `development` and `test` mode
+| `NODE_DEBUG`    | —                        | Debug logs <br> (to show all  app logs set `NODE_DEBUG=exchange-widget:*`)
+| `HOST`          | `0.0.0.0`                | Server host
+| `PORT`          | `3000`                   | Server port
+| `SITE_URL`      | `http://${HOST}:${PORT}` | Site public url <br> (used for api and socket in server and client)
+| `RATES_API_URL` | `https://ratesapi.io`    | Url to exchange rates api provider
+
+### Logs in browser
+
+Set `window.localStorage.debug = 'exchange-widget:*'` in browser console. More info in [`logdown.js`](https://github.com/caiogondim/logdown.js) docs.
+
+- `exchange-widget:store` - redux store actions
+- `exchange-widget:component:exchange-view` - `ExchangeView` component logs
+
+
 ---
 
 MIT © [John Grishin](http://johngrish.in)
