@@ -107,10 +107,7 @@ class Select extends Component {
           <SelectLabelText>
             {label}
           </SelectLabelText>
-          {isOpen
-            ? <IconUp css={{ fill: 'none' }} />
-            : <IconDown css={{ fill: 'none' }} />
-          }
+          {isOpen ? <IconUp /> : <IconDown />}
         </SelectLabel>
         {isOpen && dropdownEl}
       </SelectWrapper>

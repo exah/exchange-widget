@@ -29,7 +29,7 @@ const ExchangeViewMiddleBar = ({
     </Button>
     <Button disabled css={{ margin: '0 auto' }}>
       <Button.Item>
-        <IconTrendingUp size={14} css={{ fill: 'none' }} />
+        <IconTrendingUp size={14} />
       </Button.Item>
       <Button.Item>
         1&nbsp;{getCurrencySymbol(baseCurrency)} = {rate}&nbsp;{getCurrencySymbol(targetCurrency)}

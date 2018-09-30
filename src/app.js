@@ -16,6 +16,9 @@ class App extends Component {
       :focus {
         outline: 1px solid ${THEME.color.focus};
       }
+      svg[fill="none"] {
+        fill: none; /* fix icons in 'react-feather' */
+      }
     `
   }
   render () {
