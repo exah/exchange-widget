@@ -1,12 +1,9 @@
 import globalFetch from 'isomorphic-unfetch'
-import logdown from 'logdown'
-import { DEBUG_SCOPE, CURRENCY_SYMBOLS } from './constants'
+import { CURRENCY_SYMBOLS } from './constants'
 
 const identity = (val) => val
 const noop = () => undefined
 const toArray = (src) => src == null ? [] : [].concat(src)
-
-const createLogger = (scope) => logdown(DEBUG_SCOPE + ':' + scope)
 
 const getCurrencySymbol = (currencyCode) =>
   CURRENCY_SYMBOLS[currencyCode] || currencyCode
@@ -100,7 +97,6 @@ const dedent = (strings, ...values) => {
 export {
   getCurrencySymbol,
   createScopeTypes,
-  createLogger,
   themeGet,
   path,
   dedent,

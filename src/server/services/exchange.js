@@ -1,15 +1,15 @@
 import express from 'express'
+import logdown from 'logdown'
 import * as ratesApi from '../../api/rates-api'
 
 import {
+  DEBUG_SCOPE_SERVICE,
   API_GET_RATES,
   API_SOCKET_REQUEST_LIVE_RATES,
   API_SOCKET_GET_LIVE_RATES
 } from '../../constants'
 
-import { createLogger } from '../../utils'
-
-const logger = createLogger('service')
+const logger = logdown(DEBUG_SCOPE_SERVICE)
 
 function subscribeToRates (socket) {
   const state = {
@@ -18,6 +18,7 @@ function subscribeToRates (socket) {
   }
 
   const stopTimer = () => clearTimeout(state.timer)
+
   socket.on(
     API_SOCKET_REQUEST_LIVE_RATES,
     function currencyListener ({ currency, interval = 10000 }) {
@@ -26,17 +27,16 @@ function subscribeToRates (socket) {
         logger.info('Currency:', state.currency)
 
         stopTimer()
-        ;(function repeatGetRates (i) {
-          i++
+        ;(function getRatesOnRepeat () {
           return ratesApi.getLatest(currency)
             .then((data) => {
               socket.emit(API_SOCKET_GET_LIVE_RATES, data)
-              logger.info('Emit rates')
+              logger.info('Emit rates:')
             })
             .then(() => new Promise((resolve) => { state.timer = setTimeout(resolve, interval) }))
-            .then(() => repeatGetRates(i))
-            .catch((error) => console.error(error)) // TODO: Send error to client
-        })(0)
+            .then(() => getRatesOnRepeat())
+            .catch((error) => logger.error(error)) // TODO: Send error to client
+        })()
       }
     }
   )
