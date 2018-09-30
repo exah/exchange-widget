@@ -14,10 +14,10 @@ const Button = styled(ButtonBase)`
   padding-right: 8px;
   min-width: ${themeGet('size.default')}px;
   min-height: ${themeGet('size.default')}px;
-  border-radius: 9999px;
-  border: 1px solid ${themeGet('color.alternate')};
-  background: #fff;
+  background: ${themeGet('color.white')};
   color: ${themeGet('color.accent')};
+  border: 1px solid ${themeGet('color.alternate')};
+  border-radius: 9999px;
 `
 
 const ButtonItem = styled('span')`
