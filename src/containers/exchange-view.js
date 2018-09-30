@@ -1,50 +1,14 @@
 import React, { Component } from 'react'
 import { compose } from 'recompose'
 import { connect } from 'react-redux'
-import styled from 'react-emotion'
 import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { withData } from 'react-universal-data'
-import { Shuffle as IconShuffle, TrendingUp as IconTrendingUp } from 'react-feather'
-import { CurrencyInput, Button } from '../components'
+import { CurrencyInput, ExchangeViewMiddleBar } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
-import { noop, themeGet } from '../utils'
-
-const ExchangeViewBarContainer = styled('div')`
-  display: flex;
-  align-items: center;
-  height: 0;
-  margin-left: 10px;
-  margin-right: 10px;
-  padding-right: ${themeGet('size.default')}px; /* size of missing button on right side */
-`
-
-const ExchangeViewBar = ({
-  onSwitchCurrencyClick,
-  baseCurrency,
-  targetCurrency,
-  rate
-}) => (
-  <ExchangeViewBarContainer>
-    <Button
-      type='button'
-      tabIndex={-1}
-      onClick={onSwitchCurrencyClick}
-    >
-      <IconShuffle size={14} />
-    </Button>
-    <Button disabled css={{ margin: '0 auto' }}>
-      <Button.Item>
-        <IconTrendingUp size={14} css={{ fill: 'none' }} />
-      </Button.Item>
-      <Button.Item>
-        1 {baseCurrency} = {rate} {targetCurrency}
-      </Button.Item>
-    </Button>
-  </ExchangeViewBarContainer>
-)
+import { noop } from '../utils'
 
 const valuePropType = PropTypes.oneOfType([
   PropTypes.number,
@@ -112,7 +76,7 @@ class ExchangeView extends Component {
           onChange={this.handleExchangeValueChange(baseCurrency)}
           autoFocus
         />
-        <ExchangeViewBar
+        <ExchangeViewMiddleBar
           onSwitchCurrencyClick={this.handleSwitchCurrencyClick}
           baseCurrency={baseCurrency}
           targetCurrency={targetCurrency}
