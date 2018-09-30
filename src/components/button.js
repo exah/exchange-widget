@@ -22,6 +22,7 @@ const Button = styled(ButtonBase)`
 
 const ButtonItem = styled('span')`
   display: inline-flex;
+  flex-shrink: 0;
 
   & + & {
     margin-left: 8px
