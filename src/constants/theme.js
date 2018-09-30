@@ -2,8 +2,9 @@ export const THEME_COLORS = {
   text: '#000',
   accent: '#1880EE',
   highlight: '#E63FA5',
-  bg: '#fff',
+  white: '#fff',
   focus: 'rgba(0, 0, 0, 0.2)',
+  shadow: 'rgba(0, 0, 0, 0.3)',
   faded: 'rgba(0, 0, 0, 0.5)',
   alternate: 'rgba(0, 0, 0, 0.07)'
 }
@@ -25,6 +26,10 @@ export const THEME_TEXT_STYLES = {
   },
   caption: {
     fontSize: '0.8rem',
+    fontWeight: 400
+  },
+  option: {
+    fontSize: '1rem',
     fontWeight: 400
   }
 }
