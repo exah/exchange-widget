@@ -16,7 +16,7 @@ const Button = styled(ButtonBase)`
   min-height: ${themeGet('size.default')}px;
   background: ${themeGet('color.white')};
   color: ${themeGet('color.accent')};
-  border: 1px solid ${themeGet('color.alternate')};
+  border: 1px solid ${themeGet('color.bg')};
   border-radius: 9999px;
 `
 

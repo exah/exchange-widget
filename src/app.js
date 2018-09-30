@@ -12,6 +12,7 @@ class App extends Component {
     injectGlobal`
       :root {
         ${THEME.textStyle.root}
+        background-color: ${THEME.color.bg};
       }
       :focus {
         outline: 1px solid ${THEME.color.focus};

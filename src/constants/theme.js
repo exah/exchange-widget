@@ -6,7 +6,7 @@ export const THEME_COLORS = {
   focus: 'rgba(0, 0, 0, 0.2)',
   shadow: 'rgba(0, 0, 0, 0.3)',
   faded: 'rgba(0, 0, 0, 0.5)',
-  alternate: 'rgba(0, 0, 0, 0.07)'
+  bg: '#EDEDED'
 }
 
 export const THEME_TEXT_STYLES = {

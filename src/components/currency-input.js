@@ -10,7 +10,7 @@ const CurrencyContainer = styled('div')`
   padding-bottom: 50px;
   padding-left: 15px;
   padding-right: 15px;
-  background-color: ${(props) => props.alternateColor && themeGet('color.alternate')};
+  background-color: ${(props) => props.alternateColor ? themeGet('color.bg') : themeGet('color.white')};
 `
 
 const CurrencyWrapper = styled('div')`
