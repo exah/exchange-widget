@@ -1,5 +1,7 @@
 {
-  "alias": "exchange-widget",
+  "name": "exchange-widget",
+  "alias": "exchange-widget.now.sh",
   "type": "docker",
-  "public": true
+  "public": true,
+  "env": { "SITE_URL": "https://exchange-widget.now.sh" }
 }
