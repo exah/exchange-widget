@@ -1,4 +1,9 @@
+
 # Exchange Widget
+
+> Small exchange app that gets actual rates from https://ratesapi.io
+
+<img src="./screenshot.png" alt="" width="500" />
 
 ## Requirements
 
@@ -23,7 +28,7 @@ $ open http://0.0.0.0:3000
 ```
 
 
-## Config
+## Configuration
 
 ### Server environment variables
 
@@ -38,11 +43,12 @@ $ open http://0.0.0.0:3000
 
 ### Logs in browser
 
-Set `window.localStorage.debug = 'exchange-widget:*'` in browser console. More info in [`logdown.js`](https://github.com/caiogondim/logdown.js) docs.
+Set `window.localStorage.debug = 'exchange-widget:*'` in browser console.
 
 - `exchange-widget:store` - redux store actions
 - `exchange-widget:component:exchange-view` - `ExchangeView` component logs
 
+More info in [`logdown.js`](https://github.com/caiogondim/logdown.js) docs.
 
 ---
 
