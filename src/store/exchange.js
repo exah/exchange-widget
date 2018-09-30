@@ -31,9 +31,6 @@ const INITIAL_STATE = {
   targetCurrency: null
 }
 
-const round = (num) =>
-  num > 0 ? Math.floor(Number(num) * 100) / 100 : ''
-
 function exchangeReducer (state = INITIAL_STATE, action = {}) {
   const baseState = {
     ...INITIAL_STATE,
@@ -70,7 +67,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
       if (action.payload.value < 0) return state
       return {
         ...state,
-        value: round(action.payload.value),
+        value: action.payload.value,
         currency: action.payload.currency
       }
     }
@@ -116,6 +113,8 @@ const getLiveExchangeRates = ({ currency, interval }) => (dispatch, getState, { 
 // Selectors
 //
 
+const normalizeValue = (num) => num > 0 ? Math.floor(Number(num) * 100) / 100 : ''
+
 function getSelectors (getState = identity) {
   const getRates = createSelector(getState, state => state.rates || {})
   const getValue = createSelector(getState, state => state.value)
@@ -142,13 +141,13 @@ function getSelectors (getState = identity) {
   const getBaseValue = getValueSelector(
     getBaseCurrency,
     (rate, currency, value, base) =>
-      currency === base || rate === 0 ? value : round(value / rate)
+      normalizeValue(currency === base || rate === 0 ? value : value / rate)
   )
 
   const getTargetValue = getValueSelector(
     getTargetCurrency,
     (rate, currency, value, base) =>
-      currency === base ? value : round(value * rate)
+      normalizeValue(currency === base ? value : value * rate)
   )
 
   return {
