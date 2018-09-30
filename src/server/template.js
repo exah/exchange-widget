@@ -1,4 +1,4 @@
-import { dedent as html } from '../utils'
+import { html } from 'common-tags'
 
 export default ({
   app,

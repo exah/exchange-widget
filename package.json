@@ -72,6 +72,7 @@
     "@exah/webpack-universal-hot-middleware": "^1.1.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "common-tags": "^1.8.0",
     "compression": "^1.7.3",
     "config": "^2.0.1",
     "core-js": "^2.5.7",
