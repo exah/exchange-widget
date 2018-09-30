@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
+import logdown from 'logdown'
 import { compose } from 'recompose'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { withData } from 'react-universal-data'
+import { DEBUG_SCOPE_EXCHANGE_VIEW } from '../constants'
 import { CurrencyInput, ExchangeViewMiddleBar } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
 import { noop } from '../utils'
+
+const logger = logdown(DEBUG_SCOPE_EXCHANGE_VIEW)
 
 const valuePropType = PropTypes.oneOfType([
   PropTypes.number,
@@ -32,8 +36,19 @@ class ExchangeView extends Component {
   }
   stopGettingLiveRates = noop
   getLiveRates = (currency) => {
+    if (currency == null) {
+      logger.warn(`Can't get live rates for null or undefined`)
+      return
+    }
+
     this.stopGettingLiveRates()
-    this.stopGettingLiveRates = this.props.getLiveExchangeRates({ currency })
+    this.stopGettingLiveRates = this.props.getLiveExchangeRates(currency)
+  }
+  handleBaseCurrencyChange = (value) => {
+    this.props.updateExchangeBaseCurrency(value)
+  }
+  handleTargetCurrencyChange = (value) => {
+    this.props.updateExchangeTargetCurrency(value)
   }
   handleExchangeValueChange = (currency) => (e) => {
     this.props.updateExchangeValue({
@@ -45,11 +60,10 @@ class ExchangeView extends Component {
     this.props.switchExchangeCurrencies()
   }
   componentDidMount () {
-    const { baseCurrency } = this.props
-    this.getLiveRates(baseCurrency)
+    this.getLiveRates(this.props.baseCurrency)
   }
   componentDidUpdate (prevProps) {
-    if (prevProps.targetCurrency !== this.props.targetCurrency) {
+    if (this.props.baseCurrency !== prevProps.baseCurrency) {
       this.getLiveRates(this.props.baseCurrency)
     }
   }
@@ -73,7 +87,8 @@ class ExchangeView extends Component {
           currencyCode={baseCurrency}
           value={baseValue}
           balance={(balanceBase.value - baseValue)}
-          onChange={this.handleExchangeValueChange(baseCurrency)}
+          onValueChange={this.handleExchangeValueChange(baseCurrency)}
+          onCurrencyChange={this.handleBaseCurrencyChange}
           autoFocus
         />
         <ExchangeViewMiddleBar
@@ -86,7 +101,8 @@ class ExchangeView extends Component {
           currencyCode={targetCurrency}
           value={targetValue}
           balance={(balanceTarget.value + targetValue)}
-          onChange={this.handleExchangeValueChange(targetCurrency)}
+          onValueChange={this.handleExchangeValueChange(targetCurrency)}
+          onCurrencyChange={this.handleTargetCurrencyChange}
           autoFocus
           alternateColor
         />
@@ -115,12 +131,13 @@ export default compose(
   ),
   withData(
     (props) => {
-      props.updateExchangeBaseCurrency({ currency: props.balanceBase.currency })
-      props.updateExchangeTargetCurrency({ currency: props.balanceTarget.currency })
+      props.updateExchangeBaseCurrency(props.balanceBase.currency)
+      props.updateExchangeTargetCurrency(props.balanceTarget.currency)
+
       return props.getExchangeRates(props.balanceBase.currency)
         .then(() => ({ isSuccess: true }))
         .catch((error) => ({ error: error.message }))
     },
-    () => false
+    () => false // only update once
   )
 )(ExchangeView)

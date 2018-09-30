@@ -31,6 +31,12 @@ const INITIAL_STATE = {
   targetCurrency: null
 }
 
+const switchCurrencies = (state) => ({
+  ...state,
+  baseCurrency: state.targetCurrency,
+  targetCurrency: state.baseCurrency
+})
+
 function exchangeReducer (state = INITIAL_STATE, action = {}) {
   const baseState = {
     ...INITIAL_STATE,
@@ -45,23 +51,27 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
       }
     }
     case TYPES.UPDATE_FROM_CURRENCY: {
+      if (state.targetCurrency === action.payload) {
+        return switchCurrencies(state)
+      }
+
       return {
         ...state,
-        baseCurrency: action.payload.currency
+        baseCurrency: action.payload
       }
     }
     case TYPES.UPDATE_TO_CURRENCY: {
+      if (state.baseCurrency === action.payload) {
+        return switchCurrencies(state)
+      }
+
       return {
         ...state,
-        targetCurrency: action.payload.currency
+        targetCurrency: action.payload
       }
     }
     case TYPES.SWITCH_CURRENCIES: {
-      return {
-        ...state,
-        baseCurrency: state.targetCurrency,
-        targetCurrency: state.baseCurrency
-      }
+      return switchCurrencies(state)
     }
     case TYPES.UPDATE_VALUE: {
       if (action.payload.value < 0) return state
@@ -96,9 +106,9 @@ const getExchangeRates = (currency) => (dispatch) =>
   exchangeApi.getRates(currency)
     .then((res) => dispatch(recieveExchangeRates({ rates: res.data })))
 
-const getLiveExchangeRates = ({ currency, interval }) => (dispatch, getState, { socket }) => {
+const getLiveExchangeRates = (currency) => (dispatch, getState, { socket }) => {
   if (socket) {
-    socket.emit(API_SOCKET_REQUEST_LIVE_RATES, { currency, interval })
+    socket.emit(API_SOCKET_REQUEST_LIVE_RATES, { currency })
 
     const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
 

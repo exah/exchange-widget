@@ -48,7 +48,7 @@ const CurrencyInput = ({
   currencyCode,
   balance,
   value,
-  onChange,
+  onValueChange,
   autoFocus,
   tabIndex
 }) => (
@@ -63,7 +63,7 @@ const CurrencyInput = ({
             type='number'
             autoFocus={autoFocus}
             value={value}
-            onChange={onChange}
+            onChange={onValueChange}
             placeholder={0}
             min={0}
           />

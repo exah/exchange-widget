@@ -31,7 +31,7 @@ function subscribeToRates (socket) {
           return ratesApi.getLatest(currency)
             .then((data) => {
               socket.emit(API_SOCKET_GET_LIVE_RATES, data)
-              logger.info('Emit rates:')
+              logger.info('Emit rates:', data.rates)
             })
             .then(() => new Promise((resolve) => { state.timer = setTimeout(resolve, interval) }))
             .then(() => getRatesOnRepeat())
