@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'react-emotion'
 import { Input } from './input'
 import { MediaObject } from './media-object'
+import { Select } from './select'
 import { themeGet, getCurrencySymbol } from '../utils'
 
 const CurrencyContainer = styled('div')`
@@ -44,7 +45,9 @@ const CurrencyInput = ({
   currencyCode,
   balance,
   value,
+  onCurrencyChange,
   onValueChange,
+  currencies = [],
   autoFocus,
   tabIndex
 }) => (
@@ -52,7 +55,20 @@ const CurrencyInput = ({
     <CurrencyWrapper>
       <MediaObject>
         <MediaObject.Side>
-          {currencyCode}
+          <Select
+            label={currencyCode}
+            value={currencyCode}
+            onChange={onCurrencyChange}
+          >
+            {({ getOptionProps }) => currencies.map((optionCurrency) => (
+              <Select.Option
+                key={optionCurrency}
+                {...getOptionProps(optionCurrency)}
+              >
+                {optionCurrency}
+              </Select.Option>
+            ))}
+          </Select>
         </MediaObject.Side>
         <MediaObject.Content>
           <CurrencyWrapperInput

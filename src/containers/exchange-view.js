@@ -78,6 +78,7 @@ class ExchangeView extends Component {
       baseValue,
       targetCurrency,
       targetValue,
+      currencies,
       rate
     } = this.props
 
@@ -89,6 +90,7 @@ class ExchangeView extends Component {
           balance={(balanceBase.value - baseValue)}
           onValueChange={this.handleExchangeValueChange(baseCurrency)}
           onCurrencyChange={this.handleBaseCurrencyChange}
+          currencies={currencies}
           autoFocus
         />
         <ExchangeViewMiddleBar
@@ -103,6 +105,7 @@ class ExchangeView extends Component {
           balance={(balanceTarget.value + targetValue)}
           onValueChange={this.handleExchangeValueChange(targetCurrency)}
           onCurrencyChange={this.handleTargetCurrencyChange}
+          currencies={currencies}
           autoFocus
           alternateColor
         />

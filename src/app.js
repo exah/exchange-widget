@@ -25,6 +25,7 @@ class App extends Component {
           // this should come from user action
           balanceBase={{ value: 1000, currency: 'USD' }}
           balanceTarget={{ value: 1000, currency: 'GBP' }}
+          currencies={[ 'USD', 'EUR', 'GBP' ]}
         />
       </ThemeProvider>
     )
