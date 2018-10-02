@@ -205,13 +205,13 @@ function getSelectors (getState = identity) {
     getTargetValue,
     getTargetBalance,
     getMaxTargetBalanceIncrementValue,
-    (value, balance, maxValue) => normalizeBalance(Math.min(value, maxValue))
+    (value, balance, maxValue) => Math.min(value, maxValue)
   )
 
   const getTargetBalanceValue = createSelector(
     getTargetBalance,
     getTargetBalanceDifference,
-    (balance, difference) => balance ? balance.value + difference : 0
+    (balance, difference) => balance ? normalizeBalance(balance.value + difference) : 0
   )
 
   const getIsValid = createSelector(
