@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import logdown from 'logdown'
-import { compose } from 'recompose'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
@@ -10,7 +9,7 @@ import { DEBUG_SCOPE_EXCHANGE_VIEW } from '../constants'
 import { Currency, ExchangeViewMiddleBar } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
-import { noop } from '../utils'
+import { noop, composeHocs } from '../utils'
 
 const logger = logdown(DEBUG_SCOPE_EXCHANGE_VIEW)
 
@@ -123,7 +122,7 @@ class ExchangeView extends Component {
   }
 }
 
-export default compose(
+export default composeHocs(
   connect(
     createStructuredSelector({
       rate: exchange.getRate,

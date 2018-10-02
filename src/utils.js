@@ -65,7 +65,11 @@ const fetch = (...args) => globalFetch(...args).then((response) => {
   })
 })
 
+const composeHocs = (...fns) =>
+  fns.reduce((a, b) => (...args) => a(b(...args)), identity)
+
 export {
+  composeHocs,
   getCurrencySymbol,
   createScopeTypes,
   themeGet,
