@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { withData } from 'react-universal-data'
 import { DEBUG_SCOPE_EXCHANGE_VIEW } from '../constants'
-import { CurrencyInput, ExchangeViewMiddleBar } from '../components'
+import { Currency, ExchangeViewMiddleBar } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
 import { noop } from '../utils'
@@ -50,10 +50,10 @@ class ExchangeView extends Component {
   handleTargetCurrencyChange = (value) => {
     this.props.updateExchangeTargetCurrency(value)
   }
-  handleExchangeValueChange = (currency) => (e) => {
+  handleExchangeValueChange = (currency) => (value) => {
     this.props.updateExchangeValue({
       currency,
-      value: e.currentTarget.value
+      value
     })
   }
   handleSwitchCurrencyClick = (e) => {
@@ -84,13 +84,14 @@ class ExchangeView extends Component {
 
     return (
       <>
-        <CurrencyInput
+        <Currency
           currencyCode={baseCurrency}
           value={baseValue}
           balance={(balanceBase.value - baseValue)}
           onValueChange={this.handleExchangeValueChange(baseCurrency)}
           onCurrencyChange={this.handleBaseCurrencyChange}
           currencies={currencies}
+          sign='-'
           autoFocus
         />
         <ExchangeViewMiddleBar
@@ -99,13 +100,14 @@ class ExchangeView extends Component {
           targetCurrency={targetCurrency}
           rate={rate}
         />
-        <CurrencyInput
+        <Currency
           currencyCode={targetCurrency}
           value={targetValue}
           balance={(balanceTarget.value + targetValue)}
           onValueChange={this.handleExchangeValueChange(targetCurrency)}
           onCurrencyChange={this.handleTargetCurrencyChange}
           currencies={currencies}
+          sign='+'
           autoFocus
           alternateColor
         />

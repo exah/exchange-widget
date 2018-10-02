@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'react-emotion'
-import { Input } from './input'
 import { MediaObject } from './media-object'
 import { Select } from './select'
+import { InputNumber } from './input-number'
 import { themeGet, getCurrencySymbol } from '../utils'
 
 const CurrencyContainer = styled('div')`
@@ -17,20 +17,9 @@ const CurrencyWrapper = styled('div')`
   ${themeGet('textStyle.accent')}
 `
 
-const CurrencyWrapperInput = styled(Input)`
+const CurrencyInput = styled(InputNumber)`
   width: 100%;
   text-align: right;
-  color: ${props => themeGet(props.value ? 'color.text' : 'color.faded')};
-
-  &::placeholder {
-    color: ${themeGet('color.faded')}
-  }
-
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    appearance: none;
-    margin: 0;
-  }
 `
 
 const BalanceWrapper = styled('div')`
@@ -40,11 +29,12 @@ const BalanceWrapper = styled('div')`
   color: ${themeGet('color.faded')}
 `
 
-const CurrencyInput = ({
+const Currency = ({
   alternateColor,
   currencyCode,
   balance,
   value,
+  sign,
   onCurrencyChange,
   onValueChange,
   currencies = [],
@@ -71,13 +61,12 @@ const CurrencyInput = ({
           </Select>
         </MediaObject.Side>
         <MediaObject.Content>
-          <CurrencyWrapperInput
-            type='number'
+          <CurrencyInput
+            placeholder={0}
             autoFocus={autoFocus}
+            prefix={sign}
             value={value}
             onChange={onValueChange}
-            placeholder={0}
-            min={0}
           />
         </MediaObject.Content>
       </MediaObject>
@@ -89,5 +78,5 @@ const CurrencyInput = ({
 )
 
 export {
-  CurrencyInput
+  Currency
 }
