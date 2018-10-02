@@ -1,22 +1,22 @@
 import { createAction } from 'redux-actions'
 import { createSelector } from 'reselect'
 import * as exchangeApi from '../api/exchange'
-import { identity, noop, createScopeTypes } from '../utils'
+import { identity, noop, createScopeTypes, round } from '../utils'
 
 import {
   API_SOCKET_GET_LIVE_RATES,
   API_SOCKET_REQUEST_LIVE_RATES
 } from '../constants'
 
-const scopeTypes = createScopeTypes('@exchange')
-
-const TYPES = scopeTypes(
+const TYPES = createScopeTypes('@exchange')(
   'RESET',
   'RECIEVE_RATES',
   'UPDATE_VALUE',
   'UPDATE_FROM_CURRENCY',
   'UPDATE_TO_CURRENCY',
-  'SWITCH_CURRENCIES'
+  'SWITCH_CURRENCIES',
+  'RECEIVE_BALANCE',
+  'COMMIT_BALANCE_CHANGES'
 )
 
 //
@@ -25,11 +25,14 @@ const TYPES = scopeTypes(
 
 const INITIAL_STATE = {
   rates: {},
+  balance: [],
   value: '',
   currency: null,
   baseCurrency: null,
   targetCurrency: null
 }
+
+const selectors = getSelectors()
 
 const switchCurrencies = (state) => ({
   ...state,
@@ -81,6 +84,38 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
         currency: action.payload.currency
       }
     }
+    case TYPES.RECEIVE_BALANCE: {
+      return {
+        ...state,
+        balance: action.payload.balance || []
+      }
+    }
+    case TYPES.COMMIT_BALANCE_CHANGES: {
+      const baseBalanceValue = selectors.getBaseBalanceValue(state)
+      const targetBalanceValue = selectors.getTargetBalanceValue(state)
+
+      return {
+        ...state,
+        value: '',
+        balance: state.balance.map((balance) => {
+          if (balance.currency === state.targetCurrency) {
+            return {
+              ...balance,
+              value: targetBalanceValue
+            }
+          }
+
+          if (balance.currency === state.baseCurrency) {
+            return {
+              ...balance,
+              value: baseBalanceValue
+            }
+          }
+
+          return balance
+        })
+      }
+    }
     case TYPES.RESET: {
       return {
         ...state,
@@ -92,38 +127,11 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
 }
 
 //
-// Actions
-//
-
-const recieveExchangeRates = createAction(TYPES.RECIEVE_RATES)
-const updateExchangeBaseCurrency = createAction(TYPES.UPDATE_FROM_CURRENCY)
-const updateExchangeTargetCurrency = createAction(TYPES.UPDATE_TO_CURRENCY)
-const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
-const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
-const resetExchangeState = createAction(TYPES.RESET)
-
-const getExchangeRates = (currency) => (dispatch) =>
-  exchangeApi.getRates(currency)
-    .then((res) => dispatch(recieveExchangeRates({ rates: res.data })))
-
-const getLiveExchangeRates = (currency) => (dispatch, getState, { socket }) => {
-  if (socket) {
-    socket.emit(API_SOCKET_REQUEST_LIVE_RATES, { currency })
-
-    const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
-
-    socket.on(API_SOCKET_GET_LIVE_RATES, listener)
-    return () => socket.removeListener(API_SOCKET_GET_LIVE_RATES, listener)
-  }
-
-  return noop
-}
-
-//
 // Selectors
 //
 
-const normalizeValue = (num) => num > 0 ? Math.floor(Number(num) * 100) / 100 : ''
+const normalizeValue = (num) => num > 0 ? round(Number(num), 2) : ''
+const normalizeBalance = (num) => round(Math.max(num, 0), 2)
 
 function getSelectors (getState = identity) {
   const getRates = createSelector(getState, state => state.rates || {})
@@ -131,6 +139,7 @@ function getSelectors (getState = identity) {
   const getCurrency = createSelector(getState, state => state.currency)
   const getBaseCurrency = createSelector(getState, state => state.baseCurrency)
   const getTargetCurrency = createSelector(getState, state => state.targetCurrency)
+  const getBalance = createSelector(getState, state => state.balance || [])
 
   const getRate = createSelector(
     getRates,
@@ -160,24 +169,113 @@ function getSelectors (getState = identity) {
       normalizeValue(currency === base ? value : value * rate)
   )
 
+  const getCurrencies = createSelector(
+    getBalance,
+    balance => balance.map((b) => b.currency)
+  )
+
+  const findBalanceByCurrency = (balance, currency) =>
+    balance.find(b => b.currency === currency)
+
+  const getBaseBalance = createSelector(
+    getBalance,
+    getBaseCurrency,
+    findBalanceByCurrency
+  )
+
+  const getTargetBalance = createSelector(
+    getBalance,
+    getTargetCurrency,
+    findBalanceByCurrency
+  )
+
+  const getBaseBalanceValue = createSelector(
+    getBaseValue,
+    getBaseBalance,
+    (value, balance) => balance ? normalizeBalance(balance.value - value) : 0
+  )
+
+  const getMaxTargetBalanceIncrementValue = createSelector(
+    getRate,
+    getBaseBalance,
+    (rate, balance) => balance != null ? normalizeValue(rate * balance.value) : 0
+  )
+
+  const getTargetBalanceDifference = createSelector(
+    getTargetValue,
+    getTargetBalance,
+    getMaxTargetBalanceIncrementValue,
+    (value, balance, maxValue) => normalizeBalance(Math.min(value, maxValue))
+  )
+
+  const getTargetBalanceValue = createSelector(
+    getTargetBalance,
+    getTargetBalanceDifference,
+    (balance, difference) => balance ? balance.value + difference : 0
+  )
+
   return {
+    getBalance,
     getBaseCurrency,
     getTargetCurrency,
     getCurrency,
     getValue,
     getRate,
     getBaseValue,
-    getTargetValue
+    getTargetValue,
+    getCurrencies,
+    getBaseBalance,
+    getTargetBalance,
+    getBaseBalanceValue,
+    getMaxTargetBalanceIncrementValue,
+    getTargetBalanceValue
   }
 }
+
+//
+// Actions
+//
+
+const recieveExchangeRates = createAction(TYPES.RECIEVE_RATES)
+const updateExchangeBaseCurrency = createAction(TYPES.UPDATE_FROM_CURRENCY)
+const updateExchangeTargetCurrency = createAction(TYPES.UPDATE_TO_CURRENCY)
+const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
+const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
+const receiveBalance = createAction(TYPES.RECEIVE_BALANCE)
+const commitBalanceChanges = createAction(TYPES.COMMIT_BALANCE_CHANGES)
+const resetExchangeState = createAction(TYPES.RESET)
+
+const getExchangeRates = (currency) => (dispatch) =>
+  exchangeApi.getRates(currency)
+    .then((res) => dispatch(recieveExchangeRates({ rates: res.data })))
+
+const getLiveExchangeRates = (currency) => (dispatch, getState, { socket }) => {
+  if (socket) {
+    socket.emit(API_SOCKET_REQUEST_LIVE_RATES, { currency })
+
+    const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
+
+    socket.on(API_SOCKET_GET_LIVE_RATES, listener)
+    return () => socket.removeListener(API_SOCKET_GET_LIVE_RATES, listener)
+  }
+
+  return noop
+}
+
+const getUserBalance = () => (dispatch) =>
+  exchangeApi.getUserBalance()
+    .then((res) => dispatch(receiveBalance({ balance: res.data })))
 
 export {
   recieveExchangeRates,
   updateExchangeBaseCurrency,
   updateExchangeTargetCurrency,
   updateExchangeValue,
+  receiveBalance,
+  commitBalanceChanges,
   resetExchangeState,
   switchExchangeCurrencies,
+  getUserBalance,
   getLiveExchangeRates,
   getExchangeRates,
   getSelectors

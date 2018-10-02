@@ -1,10 +1,12 @@
 import test from 'ava'
+import balanceData from '../data/balance.json'
 import createStore from './index'
 import * as actions from './exchange'
 
 const storeWithState = (state) => createStore({
   exchange: {
     rates: { GBP: 0.5, USD: 1, EUR: 0.75 },
+    balance: balanceData,
     value: 1,
     currency: 'USD',
     baseCurrency: 'USD',
@@ -79,4 +81,14 @@ test('set new base currency to target currency value and switch them', t => {
   const changedState = store.getState()
   t.is(selectors.getBaseCurrency(changedState), targetCurrency)
   t.is(selectors.getTargetCurrency(changedState), baseCurrency)
+})
+
+test('commit balance changes', t => {
+  const store = storeWithState()
+  store.dispatch(actions.updateExchangeValue({ value: 100, currency: 'USD' }))
+  store.dispatch(actions.commitBalanceChanges())
+
+  const changedState = store.getState()
+  t.is(selectors.getBaseBalanceValue(changedState), 900)
+  t.is(selectors.getTargetBalanceValue(changedState), 1050)
 })

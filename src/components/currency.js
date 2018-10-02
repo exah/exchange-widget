@@ -72,7 +72,7 @@ const Currency = ({
       </MediaObject>
     </CurrencyWrapper>
     <BalanceWrapper>
-      Balance: {Math.max(balance, 0)} {getCurrencySymbol(currencyCode)}
+      Balance: {balance} {getCurrencySymbol(currencyCode)}
     </BalanceWrapper>
   </CurrencyContainer>
 )

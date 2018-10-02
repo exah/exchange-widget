@@ -27,9 +27,8 @@ class App extends Component {
       <ThemeProvider theme={THEME}>
         <ExchangeView
           // this should come from user action
-          balanceBase={{ value: 1000, currency: 'USD' }}
-          balanceTarget={{ value: 1000, currency: 'GBP' }}
-          currencies={[ 'USD', 'EUR', 'GBP' ]}
+          defaultBaseCurrency='USD'
+          defaultTargetCurrency='GBP'
         />
       </ThemeProvider>
     )

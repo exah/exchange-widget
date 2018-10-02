@@ -1,10 +1,12 @@
 import express from 'express'
 import logdown from 'logdown'
 import * as ratesApi from '../../api/rates-api'
+import balanceData from '../../data/balance.json'
 
 import {
   DEBUG_SCOPE_SERVICE,
   API_GET_RATES,
+  API_GET_USER_BALANCE,
   API_SOCKET_REQUEST_LIVE_RATES,
   API_SOCKET_GET_LIVE_RATES
 } from '../../constants'
@@ -67,6 +69,14 @@ export default function exchangeService (io) {
         message: error.message,
         data: null
       }))
+  })
+
+  router.get(API_GET_USER_BALANCE, (req, res) => {
+    res.json({
+      status: 200,
+      message: 'ok',
+      data: balanceData
+    })
   })
 
   return router

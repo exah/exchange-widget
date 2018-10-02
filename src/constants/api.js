@@ -3,6 +3,7 @@
 //
 
 export const API_GET_RATES = '/api/rates/:currency'
+export const API_GET_USER_BALANCE = '/api/balance'
 export const API_SOCKET_REQUEST_LIVE_RATES = 'exchange-rates.live.request'
 export const API_SOCKET_GET_LIVE_RATES = 'exchange-rates.live.get'
 

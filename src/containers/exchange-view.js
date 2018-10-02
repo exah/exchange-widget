@@ -19,20 +19,21 @@ const valuePropType = PropTypes.oneOfType([
   PropTypes.oneOf([ '' ])
 ])
 
-const balanceShape = PropTypes.shape({
-  value: PropTypes.number.isRequired,
-  currency: PropTypes.string.isRequired
-})
-
 class ExchangeView extends Component {
   static propTypes = {
-    balanceBase: balanceShape.isRequired,
-    balanceTarget: balanceShape.isRequired,
+    baseBalanceValue: PropTypes.number.isRequired,
+    targetBalanceValue: PropTypes.number.isRequired,
     baseCurrency: PropTypes.string.isRequired,
     targetCurrency: PropTypes.string.isRequired,
     baseValue: valuePropType.isRequired,
     targetValue: valuePropType.isRequired,
     rate: PropTypes.number.isRequired
+  }
+  constructor (props) {
+    super(props)
+
+    props.updateExchangeBaseCurrency(props.defaultBaseCurrency)
+    props.updateExchangeTargetCurrency(props.defaultTargetCurrency)
   }
   stopGettingLiveRates = noop
   getLiveRates = (currency) => {
@@ -56,6 +57,9 @@ class ExchangeView extends Component {
       value
     })
   }
+  handleSubmitClick = (e) => {
+    this.props.commitBalanceChanges()
+  }
   handleSwitchCurrencyClick = (e) => {
     this.props.switchExchangeCurrencies()
   }
@@ -72,8 +76,8 @@ class ExchangeView extends Component {
   }
   render () {
     const {
-      balanceBase,
-      balanceTarget,
+      baseBalanceValue,
+      targetBalanceValue,
       baseCurrency,
       baseValue,
       targetCurrency,
@@ -87,7 +91,7 @@ class ExchangeView extends Component {
         <Currency
           currencyCode={baseCurrency}
           value={baseValue}
-          balance={(balanceBase.value - baseValue)}
+          balance={baseBalanceValue}
           onValueChange={this.handleExchangeValueChange(baseCurrency)}
           onCurrencyChange={this.handleBaseCurrencyChange}
           currencies={currencies}
@@ -103,7 +107,7 @@ class ExchangeView extends Component {
         <Currency
           currencyCode={targetCurrency}
           value={targetValue}
-          balance={(balanceTarget.value + targetValue)}
+          balance={targetBalanceValue}
           onValueChange={this.handleExchangeValueChange(targetCurrency)}
           onCurrencyChange={this.handleTargetCurrencyChange}
           currencies={currencies}
@@ -111,6 +115,9 @@ class ExchangeView extends Component {
           autoFocus
           alternateColor
         />
+        <button onClick={this.handleSubmitClick}>
+          Submit
+        </button>
       </>
     )
   }
@@ -119,11 +126,14 @@ class ExchangeView extends Component {
 export default compose(
   connect(
     createStructuredSelector({
+      rate: exchange.getRate,
+      currencies: exchange.getCurrencies,
       baseCurrency: exchange.getBaseCurrency,
       targetCurrency: exchange.getTargetCurrency,
       baseValue: exchange.getBaseValue,
       targetValue: exchange.getTargetValue,
-      rate: exchange.getRate
+      baseBalanceValue: exchange.getBaseBalanceValue,
+      targetBalanceValue: exchange.getTargetBalanceValue
     }),
     (dispatch) => bindActionCreators({
       switchExchangeCurrencies: actions.switchExchangeCurrencies,
@@ -131,18 +141,20 @@ export default compose(
       updateExchangeTargetCurrency: actions.updateExchangeTargetCurrency,
       updateExchangeValue: actions.updateExchangeValue,
       getLiveExchangeRates: actions.getLiveExchangeRates,
-      getExchangeRates: actions.getExchangeRates
+      getExchangeRates: actions.getExchangeRates,
+      getUserBalance: actions.getUserBalance,
+      commitBalanceChanges: actions.commitBalanceChanges
     }, dispatch)
   ),
   withData(
-    (props) => {
-      props.updateExchangeBaseCurrency(props.balanceBase.currency)
-      props.updateExchangeTargetCurrency(props.balanceTarget.currency)
-
-      return props.getExchangeRates(props.balanceBase.currency)
+    (props) => (
+      Promise.all([
+        props.getUserBalance(),
+        props.getExchangeRates(props.defaultBaseCurrency)
+      ])
         .then(() => ({ isSuccess: true }))
         .catch((error) => ({ error: error.message }))
-    },
+    ),
     () => false // only update once
   )
 )(ExchangeView)

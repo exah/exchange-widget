@@ -1,0 +1,5 @@
+[
+  { "value": 1000, "currency": "USD" },
+  { "value": 1000, "currency": "GBP" },
+  { "value": 1000, "currency": "EUR" }
+]
