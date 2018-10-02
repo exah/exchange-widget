@@ -20,6 +20,27 @@ const Button = styled(ButtonBase)`
   border-radius: 9999px;
 `
 
+const SubmitButton = styled(ButtonBase)`
+  ${themeGet('textStyle.action')}
+
+  display: block;
+  height: 50px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 9999px;
+  color: ${themeGet('color.white')};
+  background-color: ${themeGet('color.highlight')};
+  box-shadow: 0 5px 15px ${themeGet('color.highlightShadow')};
+  transition-property: background-color, box-shadow;
+  transition-duration: .5s;
+
+  &[disabled] {
+    background-color: ${themeGet('color.highlightFaded')};
+    box-shadow: 0 5px 15px ${themeGet('color.highlightShadowFaded')};
+  }
+`
+
 const ButtonItem = styled('span')`
   display: inline-flex;
   flex-shrink: 0;
@@ -36,5 +57,6 @@ Object.assign(Button, {
 export {
   ButtonBase,
   ButtonItem,
-  Button
+  Button,
+  SubmitButton
 }

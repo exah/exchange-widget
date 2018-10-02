@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux'
 import { createStructuredSelector } from 'reselect'
 import { withData } from 'react-universal-data'
 import { DEBUG_SCOPE_EXCHANGE_VIEW } from '../constants'
-import { Currency, ExchangeViewMiddleBar } from '../components'
+import { Currency, ExchangeViewMiddleBar, SubmitButton } from '../components'
 import { exchange } from '../store/reducers'
 import * as actions from '../store/exchange'
 import { noop, composeHocs } from '../utils'
@@ -114,9 +114,9 @@ class ExchangeView extends Component {
           autoFocus
           alternateColor
         />
-        <button onClick={this.handleSubmitClick}>
-          Submit
-        </button>
+        <SubmitButton onClick={this.handleSubmitClick}>
+          Exchange
+        </SubmitButton>
       </>
     )
   }
@@ -125,6 +125,7 @@ class ExchangeView extends Component {
 export default composeHocs(
   connect(
     createStructuredSelector({
+      isValid: exchange.getIsValid,
       rate: exchange.getRate,
       currencies: exchange.getCurrencies,
       baseCurrency: exchange.getBaseCurrency,
