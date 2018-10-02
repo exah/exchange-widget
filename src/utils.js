@@ -8,6 +8,11 @@ const toArray = (src) => src == null ? [] : [].concat(src)
 const getCurrencySymbol = (currencyCode) =>
   CURRENCY_SYMBOLS[currencyCode] || currencyCode
 
+const round = (number, precision) => {
+  const factor = Math.pow(10, precision)
+  return Math.round(number * factor) / factor
+}
+
 const path = (input, src, fallback) => {
   const paths = typeof input === 'string' ? input.split('.') : toArray(input)
   let val = src
@@ -68,5 +73,6 @@ export {
   noop,
   fetch,
   getQuery,
-  identity
+  identity,
+  round
 }
