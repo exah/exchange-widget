@@ -82,7 +82,8 @@ class ExchangeView extends Component {
       targetCurrency,
       targetValue,
       currencies,
-      rate
+      rate,
+      isValid
     } = this.props
 
     return (
@@ -114,7 +115,7 @@ class ExchangeView extends Component {
           autoFocus
           alternateColor
         />
-        <SubmitButton onClick={this.handleSubmitClick}>
+        <SubmitButton onClick={this.handleSubmitClick} disabled={!isValid}>
           Exchange
         </SubmitButton>
       </>

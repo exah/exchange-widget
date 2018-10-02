@@ -214,7 +214,14 @@ function getSelectors (getState = identity) {
     (balance, difference) => balance ? balance.value + difference : 0
   )
 
+  const getIsValid = createSelector(
+    getTargetValue,
+    getMaxTargetBalanceIncrementValue,
+    (value, maxValue) => value > 0 && value <= maxValue
+  )
+
   return {
+    getIsValid,
     getBalance,
     getBaseCurrency,
     getTargetCurrency,
