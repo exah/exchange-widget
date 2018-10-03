@@ -8,7 +8,7 @@ import { withData } from 'react-universal-data'
 import { DEBUG_SCOPE_EXCHANGE_VIEW } from '../constants'
 import { Currency, ExchangeViewMiddleBar, SubmitButton } from '../components'
 import { exchange } from '../store/reducers'
-import * as actions from '../store/exchange'
+import * as exchangeActions from '../store/exchange'
 import { noop, composeHocs } from '../utils'
 
 const logger = logdown(DEBUG_SCOPE_EXCHANGE_VIEW)
@@ -29,19 +29,19 @@ class ExchangeView extends Component {
     targetCurrency: PropTypes.string,
     baseValue: valuePropType.isRequired,
     targetValue: valuePropType.isRequired,
-    switchExchangeCurrencies: PropTypes.func.isRequired,
-    updateExchangeBaseCurrency: PropTypes.func.isRequired,
-    updateExchangeTargetCurrency: PropTypes.func.isRequired,
-    updateExchangeValue: PropTypes.func.isRequired,
+    switchCurrencies: PropTypes.func.isRequired,
+    updateBaseCurrency: PropTypes.func.isRequired,
+    updateTargetCurrency: PropTypes.func.isRequired,
+    updateValue: PropTypes.func.isRequired,
     getLiveExchangeRates: PropTypes.func.isRequired,
     commitBalanceChanges: PropTypes.func.isRequired,
-    resetExchangeState: PropTypes.func.isRequired
+    resetState: PropTypes.func.isRequired
   }
   constructor (props) {
     super(props)
 
-    props.updateExchangeBaseCurrency(props.defaultBaseCurrency)
-    props.updateExchangeTargetCurrency(props.defaultTargetCurrency)
+    props.updateBaseCurrency(props.defaultBaseCurrency)
+    props.updateTargetCurrency(props.defaultTargetCurrency)
   }
   stopGettingLiveRates = noop
   getLiveRates = (currency) => {
@@ -54,13 +54,13 @@ class ExchangeView extends Component {
     this.stopGettingLiveRates = this.props.getLiveExchangeRates(currency)
   }
   handleBaseCurrencyChange = (value) => {
-    this.props.updateExchangeBaseCurrency(value)
+    this.props.updateBaseCurrency(value)
   }
   handleTargetCurrencyChange = (value) => {
-    this.props.updateExchangeTargetCurrency(value)
+    this.props.updateTargetCurrency(value)
   }
-  handleExchangeValueChange = (currency) => (value) => {
-    this.props.updateExchangeValue({
+  handleValueChange = (currency) => (value) => {
+    this.props.updateValue({
       currency,
       value
     })
@@ -69,7 +69,7 @@ class ExchangeView extends Component {
     this.props.commitBalanceChanges()
   }
   handleSwitchCurrencyClick = (e) => {
-    this.props.switchExchangeCurrencies()
+    this.props.switchCurrencies()
   }
   componentDidMount () {
     this.getLiveRates(this.props.baseCurrency)
@@ -81,7 +81,7 @@ class ExchangeView extends Component {
   }
   componentWillUnmount () {
     this.stopGettingLiveRates()
-    this.props.resetExchangeState()
+    this.props.resetState()
   }
   render () {
     const {
@@ -102,7 +102,7 @@ class ExchangeView extends Component {
           currencyCode={baseCurrency}
           value={baseValue}
           balance={baseBalanceValue}
-          onValueChange={this.handleExchangeValueChange(baseCurrency)}
+          onValueChange={this.handleValueChange(baseCurrency)}
           onCurrencyChange={this.handleBaseCurrencyChange}
           currencies={currencies}
           sign='-'
@@ -118,7 +118,7 @@ class ExchangeView extends Component {
           currencyCode={targetCurrency}
           value={targetValue}
           balance={targetBalanceValue}
-          onValueChange={this.handleExchangeValueChange(targetCurrency)}
+          onValueChange={this.handleValueChange(targetCurrency)}
           onCurrencyChange={this.handleTargetCurrencyChange}
           currencies={currencies}
           sign='+'
@@ -147,15 +147,15 @@ export default composeHocs(
       targetBalanceValue: exchange.getTargetBalanceValue
     }),
     (dispatch) => bindActionCreators({
-      switchExchangeCurrencies: actions.switchExchangeCurrencies,
-      updateExchangeBaseCurrency: actions.updateExchangeBaseCurrency,
-      updateExchangeTargetCurrency: actions.updateExchangeTargetCurrency,
-      updateExchangeValue: actions.updateExchangeValue,
-      getLiveExchangeRates: actions.getLiveExchangeRates,
-      getExchangeRates: actions.getExchangeRates,
-      getUserBalance: actions.getUserBalance,
-      commitBalanceChanges: actions.commitBalanceChanges,
-      resetExchangeState: actions.resetExchangeState
+      switchCurrencies: exchangeActions.switchCurrencies,
+      updateBaseCurrency: exchangeActions.updateBaseCurrency,
+      updateTargetCurrency: exchangeActions.updateTargetCurrency,
+      updateValue: exchangeActions.updateValue,
+      getLiveExchangeRates: exchangeActions.getLiveExchangeRates,
+      getExchangeRates: exchangeActions.getExchangeRates,
+      getUserBalance: exchangeActions.getUserBalance,
+      commitBalanceChanges: exchangeActions.commitBalanceChanges,
+      resetState: exchangeActions.resetState
     }, dispatch)
   ),
   withData(

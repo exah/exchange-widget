@@ -27,7 +27,7 @@ test('get initial values', t => {
 
 test('change currency and value', t => {
   const store = storeWithState()
-  store.dispatch(actions.updateExchangeValue({ value: 10, currency: 'GBP' }))
+  store.dispatch(actions.updateValue({ value: 10, currency: 'GBP' }))
 
   const changedState = store.getState()
   t.is(selectors.getBaseValue(changedState), 20)
@@ -36,7 +36,7 @@ test('change currency and value', t => {
 
 test('recieve new exchange rates', t => {
   const store = storeWithState({ value: 10, currency: 'GBP' })
-  store.dispatch(actions.recieveExchangeRates({ rates: { GBP: 0.25 } }))
+  store.dispatch(actions.recieveRates({ rates: { GBP: 0.25 } }))
 
   const changedState = store.getState()
   t.is(selectors.getBaseValue(changedState), 40)
@@ -48,8 +48,8 @@ test('set new base currency', t => {
   const initialState = store.getState()
   const baseCurrency = selectors.getBaseCurrency(initialState)
 
-  store.dispatch(actions.updateExchangeBaseCurrency('EUR'))
-  store.dispatch(actions.recieveExchangeRates({ rates: { GBP: 0.5 } }))
+  store.dispatch(actions.updateBaseCurrency('EUR'))
+  store.dispatch(actions.recieveRates({ rates: { GBP: 0.5 } }))
 
   const changedState = store.getState()
   t.not(selectors.getBaseCurrency(changedState), baseCurrency)
@@ -62,7 +62,7 @@ test('set new target currency', t => {
   const initialState = store.getState()
   const baseCurrency = selectors.getBaseCurrency(initialState)
 
-  store.dispatch(actions.updateExchangeTargetCurrency('EUR'))
+  store.dispatch(actions.updateTargetCurrency('EUR'))
 
   const changedState = store.getState()
   t.is(selectors.getBaseCurrency(changedState), baseCurrency)
@@ -76,7 +76,7 @@ test('switch exchange currencies', t => {
   const baseCurrency = selectors.getBaseCurrency(initialState)
   const targetCurrency = selectors.getTargetCurrency(initialState)
 
-  store.dispatch(actions.switchExchangeCurrencies())
+  store.dispatch(actions.switchCurrencies())
 
   const changedState = store.getState()
   t.is(selectors.getBaseCurrency(changedState), targetCurrency)
@@ -89,7 +89,7 @@ test('set new base currency to target currency value and switch them', t => {
   const baseCurrency = selectors.getBaseCurrency(initialState)
   const targetCurrency = selectors.getTargetCurrency(initialState)
 
-  store.dispatch(actions.updateExchangeBaseCurrency(targetCurrency))
+  store.dispatch(actions.updateBaseCurrency(targetCurrency))
 
   const changedState = store.getState()
   t.is(selectors.getBaseCurrency(changedState), targetCurrency)
@@ -98,7 +98,7 @@ test('set new base currency to target currency value and switch them', t => {
 
 test('commit balance changes', t => {
   const store = storeWithState()
-  store.dispatch(actions.updateExchangeValue({ value: 100, currency: 'USD' }))
+  store.dispatch(actions.updateValue({ value: 100, currency: 'USD' }))
   store.dispatch(actions.commitBalanceChanges())
 
   const changedState = store.getState()

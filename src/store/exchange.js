@@ -34,7 +34,7 @@ const INITIAL_STATE = {
 
 const selectors = getSelectors()
 
-const switchCurrencies = (state) => ({
+const switchCurrenciesState = (state) => ({
   ...state,
   baseCurrency: state.targetCurrency,
   targetCurrency: state.baseCurrency
@@ -55,7 +55,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
     }
     case TYPES.UPDATE_BASE_CURRENCY: {
       if (state.targetCurrency === action.payload) {
-        return switchCurrencies(state)
+        return switchCurrenciesState(state)
       }
 
       return {
@@ -65,7 +65,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
     }
     case TYPES.UPDATE_TARGET_CURRENCY: {
       if (state.baseCurrency === action.payload) {
-        return switchCurrencies(state)
+        return switchCurrenciesState(state)
       }
 
       return {
@@ -74,7 +74,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
       }
     }
     case TYPES.SWITCH_CURRENCIES: {
-      return switchCurrencies(state)
+      return switchCurrenciesState(state)
     }
     case TYPES.UPDATE_VALUE: {
       if (action.payload.value < 0) return state
@@ -243,24 +243,24 @@ function getSelectors (getState = identity) {
 // Actions
 //
 
-const recieveExchangeRates = createAction(TYPES.RECIEVE_RATES)
-const updateExchangeBaseCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
-const updateExchangeTargetCurrency = createAction(TYPES.UPDATE_TARGET_CURRENCY)
-const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
-const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
+const recieveRates = createAction(TYPES.RECIEVE_RATES)
+const updateBaseCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
+const updateTargetCurrency = createAction(TYPES.UPDATE_TARGET_CURRENCY)
+const updateValue = createAction(TYPES.UPDATE_VALUE)
+const switchCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
 const receiveBalance = createAction(TYPES.RECEIVE_BALANCE)
 const commitBalanceChanges = createAction(TYPES.COMMIT_BALANCE_CHANGES)
-const resetExchangeState = createAction(TYPES.RESET)
+const resetState = createAction(TYPES.RESET)
 
 const getExchangeRates = (currency) => (dispatch) =>
   exchangeApi.getRates(currency)
-    .then((res) => dispatch(recieveExchangeRates({ rates: res.data })))
+    .then((res) => dispatch(recieveRates({ rates: res.data })))
 
 const getLiveExchangeRates = (currency) => (dispatch, getState, { socket }) => {
   if (socket) {
     socket.emit(API_SOCKET_REQUEST_LIVE_RATES, { currency })
 
-    const listener = (data) => dispatch(recieveExchangeRates({ rates: data.rates }))
+    const listener = (data) => dispatch(recieveRates({ rates: data.rates }))
 
     socket.on(API_SOCKET_GET_LIVE_RATES, listener)
     return () => socket.removeListener(API_SOCKET_GET_LIVE_RATES, listener)
@@ -274,17 +274,17 @@ const getUserBalance = () => (dispatch) =>
     .then((res) => dispatch(receiveBalance({ balance: res.data })))
 
 export {
-  recieveExchangeRates,
-  updateExchangeBaseCurrency,
-  updateExchangeTargetCurrency,
-  updateExchangeValue,
+  recieveRates,
+  updateBaseCurrency,
+  updateTargetCurrency,
+  updateValue,
   receiveBalance,
   commitBalanceChanges,
-  resetExchangeState,
-  switchExchangeCurrencies,
+  resetState,
+  switchCurrencies,
   getUserBalance,
-  getLiveExchangeRates,
   getExchangeRates,
+  getLiveExchangeRates,
   getSelectors
 }
 
