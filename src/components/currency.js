@@ -46,6 +46,7 @@ const Currency = ({
       <MediaObject>
         <MediaObject.Side>
           <Select
+            placeholder='Select'
             label={currencyCode}
             value={currencyCode}
             onChange={onCurrencyChange}
@@ -53,7 +54,7 @@ const Currency = ({
             {({ getOptionProps }) => currencies.map((optionCurrency) => (
               <Select.Option
                 key={optionCurrency}
-                {...getOptionProps(optionCurrency)}
+                {...getOptionProps({ value: optionCurrency })}
               >
                 {optionCurrency}
               </Select.Option>

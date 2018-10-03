@@ -45,22 +45,32 @@ const SelectOption = styled('div')`
   margin-bottom: 5px;
 `
 
+const defaultGetLabel = ({ value, label, placeholder }) =>
+  value == null ? placeholder : label
+
 class Select extends Component {
   static Option = SelectOption
   static defaultProps = {
-    onChange: noop
+    onChange: noop,
+    getLabel: defaultGetLabel
   }
   static propTypes = {
     value: PropTypes.any,
     children: PropTypes.func.isRequired,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    getLabel: PropTypes.func
   }
   constructor (props) {
     super(props)
-    const { value = props.defaultValue } = props
+
+    const {
+      value = props.defaultValue,
+      label = props.defaultLabel
+    } = props
 
     this.state = {
       value,
+      label,
       isControlled: props.value !== undefined,
       isOpen: false
     }
@@ -73,23 +83,26 @@ class Select extends Component {
   handleBlur = (e) => {
     this.setState({ isOpen: false })
   }
-  getOptionProps = (value) => {
+  getOptionProps = ({ value, label }) => {
     const { isControlled } = this.state
     return {
       isActive: isControlled ? value === this.props.value : value === this.state.value,
       onClick: (e) => {
         e.preventDefault()
-        this.props.onChange(value)
+        this.props.onChange(value, label)
 
-        if (isControlled) {
-          this.setState({ value })
+        if (!isControlled) {
+          this.setState({ value, label })
         }
       }
     }
   }
   render () {
-    const { label, children } = this.props
-    const { isOpen } = this.state
+    const { getLabel, children, placeholder } = this.props
+    const { isOpen, isControlled } = this.state
+
+    const label = isControlled ? this.props.label : this.state.label
+    const value = isControlled ? this.props.value : this.state.value
 
     const dropdownEl = (
       <SelectDropdown>
@@ -105,7 +118,7 @@ class Select extends Component {
       >
         <SelectLabel>
           <SelectLabelText>
-            {label}
+            {getLabel({ value, label, isOpen, placeholder })}
           </SelectLabelText>
           {isOpen ? <IconUp /> : <IconDown />}
         </SelectLabel>
