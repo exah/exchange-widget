@@ -57,6 +57,19 @@ test('set new base currency', t => {
   t.is(selectors.getTargetValue(changedState), 0.5)
 })
 
+test('set new target currency', t => {
+  const store = storeWithState()
+  const initialState = store.getState()
+  const baseCurrency = selectors.getBaseCurrency(initialState)
+
+  store.dispatch(actions.updateExchangeTargetCurrency('EUR'))
+
+  const changedState = store.getState()
+  t.is(selectors.getBaseCurrency(changedState), baseCurrency)
+  t.is(selectors.getTargetCurrency(changedState), 'EUR')
+  t.is(selectors.getTargetValue(changedState), 0.75)
+})
+
 test('switch exchange currencies', t => {
   const store = storeWithState()
   const initialState = store.getState()
