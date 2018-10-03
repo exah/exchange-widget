@@ -34,7 +34,8 @@ class ExchangeView extends Component {
     updateExchangeTargetCurrency: PropTypes.func.isRequired,
     updateExchangeValue: PropTypes.func.isRequired,
     getLiveExchangeRates: PropTypes.func.isRequired,
-    commitBalanceChanges: PropTypes.func.isRequired
+    commitBalanceChanges: PropTypes.func.isRequired,
+    resetExchangeState: PropTypes.func.isRequired
   }
   constructor (props) {
     super(props)
@@ -80,6 +81,7 @@ class ExchangeView extends Component {
   }
   componentWillUnmount () {
     this.stopGettingLiveRates()
+    this.props.resetExchangeState()
   }
   render () {
     const {
@@ -152,7 +154,8 @@ export default composeHocs(
       getLiveExchangeRates: actions.getLiveExchangeRates,
       getExchangeRates: actions.getExchangeRates,
       getUserBalance: actions.getUserBalance,
-      commitBalanceChanges: actions.commitBalanceChanges
+      commitBalanceChanges: actions.commitBalanceChanges,
+      resetExchangeState: actions.resetExchangeState
     }, dispatch)
   ),
   withData(
