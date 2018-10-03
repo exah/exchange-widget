@@ -12,8 +12,8 @@ const TYPES = createScopeTypes('@exchange')(
   'RESET',
   'RECIEVE_RATES',
   'UPDATE_VALUE',
-  'UPDATE_FROM_CURRENCY',
-  'UPDATE_TO_CURRENCY',
+  'UPDATE_BASE_CURRENCY',
+  'UPDATE_TARGET_CURRENCY',
   'SWITCH_CURRENCIES',
   'RECEIVE_BALANCE',
   'COMMIT_BALANCE_CHANGES'
@@ -53,7 +53,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
         rates: action.payload.rates
       }
     }
-    case TYPES.UPDATE_FROM_CURRENCY: {
+    case TYPES.UPDATE_BASE_CURRENCY: {
       if (state.targetCurrency === action.payload) {
         return switchCurrencies(state)
       }
@@ -63,7 +63,7 @@ function exchangeReducer (state = INITIAL_STATE, action = {}) {
         baseCurrency: action.payload
       }
     }
-    case TYPES.UPDATE_TO_CURRENCY: {
+    case TYPES.UPDATE_TARGET_CURRENCY: {
       if (state.baseCurrency === action.payload) {
         return switchCurrencies(state)
       }
@@ -244,8 +244,8 @@ function getSelectors (getState = identity) {
 //
 
 const recieveExchangeRates = createAction(TYPES.RECIEVE_RATES)
-const updateExchangeBaseCurrency = createAction(TYPES.UPDATE_FROM_CURRENCY)
-const updateExchangeTargetCurrency = createAction(TYPES.UPDATE_TO_CURRENCY)
+const updateExchangeBaseCurrency = createAction(TYPES.UPDATE_BASE_CURRENCY)
+const updateExchangeTargetCurrency = createAction(TYPES.UPDATE_TARGET_CURRENCY)
 const updateExchangeValue = createAction(TYPES.UPDATE_VALUE)
 const switchExchangeCurrencies = createAction(TYPES.SWITCH_CURRENCIES)
 const receiveBalance = createAction(TYPES.RECEIVE_BALANCE)
