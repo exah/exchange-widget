@@ -20,13 +20,21 @@ const valuePropType = PropTypes.oneOfType([
 
 class ExchangeView extends Component {
   static propTypes = {
+    rate: PropTypes.number.isRequired,
+    currencies: PropTypes.array.isRequired,
+    isValid: PropTypes.bool.isRequired,
     baseBalanceValue: PropTypes.number.isRequired,
     targetBalanceValue: PropTypes.number.isRequired,
-    baseCurrency: PropTypes.string.isRequired,
-    targetCurrency: PropTypes.string.isRequired,
+    baseCurrency: PropTypes.string,
+    targetCurrency: PropTypes.string,
     baseValue: valuePropType.isRequired,
     targetValue: valuePropType.isRequired,
-    rate: PropTypes.number.isRequired
+    switchExchangeCurrencies: PropTypes.func.isRequired,
+    updateExchangeBaseCurrency: PropTypes.func.isRequired,
+    updateExchangeTargetCurrency: PropTypes.func.isRequired,
+    updateExchangeValue: PropTypes.func.isRequired,
+    getLiveExchangeRates: PropTypes.func.isRequired,
+    commitBalanceChanges: PropTypes.func.isRequired
   }
   constructor (props) {
     super(props)
@@ -126,9 +134,9 @@ class ExchangeView extends Component {
 export default composeHocs(
   connect(
     createStructuredSelector({
-      isValid: exchange.getIsValid,
       rate: exchange.getRate,
       currencies: exchange.getCurrencies,
+      isValid: exchange.getIsValid,
       baseCurrency: exchange.getBaseCurrency,
       targetCurrency: exchange.getTargetCurrency,
       baseValue: exchange.getBaseValue,
