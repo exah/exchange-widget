@@ -1,5 +1,4 @@
-
-# Exchange Widget
+# [🔗 Exchange Widget](https://exchange-widget.now.sh)
 
 > Small exchange app that gets actual rates from https://ratesapi.io
 
