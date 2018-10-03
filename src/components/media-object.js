@@ -12,6 +12,14 @@ const MediaObjectSide = styled('div')`
 
 const MediaObjectContent = styled('div')`
   flex-grow: 1;
+
+  ${MediaObjectSide} + & {
+    margin-left: 5px;
+  }
+
+  & + ${MediaObjectSide} {
+    margin-right: 5px;
+  }
 `
 
 Object.assign(MediaObject, {

@@ -26,6 +26,7 @@ const SubmitButton = styled(ButtonBase)`
   display: block;
   height: 50px;
   width: 90%;
+  max-width: 500px;
   margin-left: auto;
   margin-right: auto;
   border-radius: 9999px;
